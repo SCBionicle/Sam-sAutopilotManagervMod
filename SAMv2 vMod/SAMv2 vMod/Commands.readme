@@ -1,0 +1,27 @@
+﻿
+Commands (Arguments in Programmable Block)
+-----------
+- Next = next item in list
+- Prev = prev item in list
+- Clearstorage = reset all save data in this program (recompile needed after this)
+- Clearlog = clear the log
+- Start = start auto pilot to selected destination in nav screen
+- Start [GPS] = start auto pilot setting a course to pasted GPS coordinate
+- Start next = start auto pilot going to the next destination on the nav screen
+- Start prev = start auto pilot going to the previous destination on the nav screen
+- Stop = stop autopilot
+- Screen = switch between conf screen and nav screen
+- Select = add or remove waypoint/dock from nav screen (only works in conf screen)
+- Add = add current position in conf screen
+- Add stance = add current position and direction to conf screen
+- Add dock <optional: station name> = save currently connected dock to list of docks you can navigate to (can actually dock to the target as long as it doesn't move)
+	(IMPORTANT: Make sure you're docked with only one SAM assigned connector)
+	(IMPORTANT: Does not work when target dock uses reverse connector)
+- Add [GPS] = add pasted GPS coordinate to conf screen for later navigation (name of coordinate will be saved)
+- Go [dock name] = Go to specified dock name (must be broadcasted by SAM at destination and must be known by ship first)
+- Remove = Delete selected old dock/waypoint/GPS coordinate from nav/conf screen
+- Undock = initiate undock sequence
+- Save = save all data to storage (saving data is done automatically when game autosaves)
+- Load = load all data from storage
+- Toggle = start/stop autopilot
+- Scan = scan the grid for changes

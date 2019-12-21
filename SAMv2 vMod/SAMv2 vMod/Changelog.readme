@@ -1,0 +1,59 @@
+﻿Change log:
+* vMod 9.0:
+* - Now calculates max thrust in all 6 directions rather than 3 (not really)
+* VMod 9.0.1:
+* - Adjusted pathLen <= 0.1f (or something like that) to make docking easier (under Guidance)
+* vMod 9.0.2:
+* - Added additional checks to see if timers were triggered
+* vMod 9.1.0:
+* - Added tag to slow way down (SLOWONAPPROACH) to taxi speed if the ship gets very close to the runway or landing pad
+		[Changes in CheckColision() and ProcessCloseness()]
+* - Now allowing only LCD's to be on subgrids or supergrids (doesn't include grids connected by connectors and landing gear)
+*		as well as its own grid
+* vMod 9.1.1:
+* - Changed Horizont to not ignore planets when nose is up
+* vMod 9.2.0:
+* - You can now add GPS waypoints using the "add [GPS coordinate from clipboard]" to add the waypoint to list of navigation points
+* vMod 9.3.0:
+* - Removed check for planet when nose is up or down in gravity well to avoid potential problems
+* - When escaping nose up, the ship won't stay level when it's trying to avoid hitting something (used to cause strange behavior that could be deadly)
+* vMod 9.3.1:
+* - Autopilot will now connect with connectors, when docking, without pressing against it for an indefinite amount of time.
+* vMod 9.3.2:
+* - In space, you can now have the ship align and point directly at the target if enabled
+*     (To enable, add this tag to the programmable block [ALLOWDIRECTALIGNMENT])
+* vMod 9.4.0:
+* - If you're using a connector that is supposed to be placed in a backwards position (as seen by the game),
+*   such as the VCZ Airtight Connector, then you place the "REVERSE" tag on the connector. Use the "BuildInfo" mod
+*	to see if the connector is placed backwards as seen by the game.
+*		(Notice: if the station uses this type of connector, put the tag on that station connector.
+*		If your ship uses this type of connector, then place the tag on that ship connector)
+*		(WARNING: Do not place this tag on Vinella connectors as that are not placed backwards.)
+*		(NOTICE: this is supposed to be backwards compatible with SAM, but in order to use the
+*		"REVERSE" tag on SAM, you need vMod 9.4.0 or newer for connectors that require this.
+*		Connectors on other grids should still work as intended.)
+* vMod 9.4.1:
+* - Added another check to see if connector is reversed (under "CalculateApproach")
+* vMod 9.4.2:
+* - Now outputs to cockpits even if there's no LCD panels assigned.
+* - No longer touches custom data that doesn't have SAM in it.
+* vMod 9.4.3:
+* - Moved the connector check to be after Navigation.tick() in order to fix a thruster override bug (if still occurs, pass cmd "stop" to work around this)
+* - (Dev note: thruster/gyro override release when script forcefully connects with connector)
+* vMod 9.4.4:
+* - Returned pathLen back to [pathLen <= 0.1f] under Guidance for better docking accuracy
+* - Changed aligning algorithm in Navigation to attempt better aligning when aligning directly
+* vMod 9.4.5:
+* - Scrapped the new aligning algorithm
+* vMod 9.4.6:
+* - Now scans blocks on the same grid as the programmable block.
+* vMod 9.4.7:
+* - Possible optimize of block scanning.
+* vMod 9.4.8:
+* - Made adjustments to leveling the ship when entering and exiting the planet
+* vMod 9.5.0:
+* - Added the ability to save docks of grids you don't own when docked to them (target grid must not move for this to work correctly)
+* vMod 9.5.1:
+* - Added the optional ability to name stations/grids that are added with the "add dock" command
+* vMod 9.5.2:
+* - Removed all unused references (warnings should disappear)
