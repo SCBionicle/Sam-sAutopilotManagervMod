@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29025.244
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAMv2 vMod", "SAMv2 vMod\SAMv2 vMod.csproj", "{EE7E6C94-A0F8-4D25-B5FF-57267C693FF6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EE7E6C94-A0F8-4D25-B5FF-57267C693FF6}.Debug|x64.ActiveCfg = Debug|x64
+		{EE7E6C94-A0F8-4D25-B5FF-57267C693FF6}.Debug|x64.Build.0 = Debug|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8F0B8C0B-A91B-4047-B621-AB67896AE97C}
+	EndGlobalSection
+EndGlobal
