@@ -3864,7 +3864,7 @@ namespace IngameScript
             //This is set to max_speed originally
             public static Waypoint FromString(string coordinates)
             {
-                Waypoint wp = new Waypoint(new Stance(Helper.UnserializeVector(coordinates), Vector3D.Zero, Vector3D.Zero), MAX_SPEED, wpType.CONVERGING);
+                Waypoint wp = new Waypoint(new Stance(Helper.UnserializeVector(coordinates), Vector3D.Zero, Vector3D.Zero), CONVERGING_SPEED, wpType.CONVERGING);
                 return wp;
                 //return new Waypoint(new Stance(Helper.UnserializeVector(coordinates), Vector3D.Zero, Vector3D.Zero), MAX_SPEED, wpType.CONVERGING);
 
