@@ -57,3 +57,5 @@
 * - Added the optional ability to name stations/grids that are added with the "add dock" command
 * vMod 9.5.2:
 * - Removed all unused references (warnings should disappear)
+* vMod 9.5.3:
+* - Modified waypoint parsing default speed (the difference shouldn't be noticable)
