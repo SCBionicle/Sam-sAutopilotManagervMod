@@ -1104,10 +1104,12 @@ namespace IngameScript
                 if (disconnectDock.approachPath.Count > 0)
                 {
                     //*************************** Remove Below line if breaks *****************************//
+                    Vector3D taxiBeginUnadjustedPos = disconnectDock.approachPath[disconnectDock.approachPath.Count - 1].position;
+                    Vector3D taxiBeginPos = taxiBeginUnadjustedPos + (disconnectDock.approachPath[disconnectDock.approachPath.Count - 1].direction * (APPROACH_SAFE_DISTANCE + Situation.radius));
                     Vector3D taxiEndPos = disconnectDock.approachPath[0].position + (disconnectDock.approachPath[0].direction * (APPROACH_SAFE_DISTANCE + Situation.radius)); //end taxi way pos
                     //"Vector3D newPos" is still the destination
                     //*************************** Remove Below 2 lines if breaks *****************************//
-                    Vector3D direction2 = Vector3D.Normalize(newPos - taxiEndPos);
+                    Vector3D direction2 = Vector3D.Normalize(newPos - taxiBeginPos);
                     Vector3D balancedDirection2 = Vector3D.ProjectOnPlane(ref direction2, ref Situation.gravityUpVector);
                     //*************************** Remove Below line if breaks *****************************//
                     Navigation.AddWaypoint(taxiEndPos, balancedDirection2, Situation.gravityUpVector, APPROACH_SPEED, Waypoint.wpType.ALIGNING);
@@ -1120,6 +1122,7 @@ namespace IngameScript
                 undockPos = disconnectDock.stance.forward;
                 undockPos *= (Situation.radius + UNDOCK_DISTANCE);
                 undockPos += Situation.position;
+                direction = Vector3D.Normalize(Navigation.waypoints[0].stance.position - undockPos);
                 //Navigation.AddWaypoint(undockPos, balancedDirection, Situation.gravityUpVector, APPROACH_SPEED, Waypoint.wpType.ALIGNING); //original alignment
                 if (!Situation.inGravity && Situation.alignDirectly)
                 {
