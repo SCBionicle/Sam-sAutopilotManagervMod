@@ -52,6 +52,8 @@
   <ItemGroup>
     <None Include="Changelog.readme" />
     <None Include="Commands.readme" />
+    <AdditionalFiles Include="Changelog1.readme" />
+    <AdditionalFiles Include="Commands1.readme" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">

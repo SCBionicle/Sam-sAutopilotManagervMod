@@ -1,0 +1,27 @@
+﻿* vMod 9.4.2:
+* - Now outputs to cockpits even if there's no LCD panels assigned.
+* - No longer touches custom data that doesn't have SAM in it.
+* vMod 9.4.3:
+* - Moved the connector check to be after Navigation.tick() in order to fix a thruster override bug (if still occurs, pass cmd "stop" to work around this)
+* - (Dev note: thruster/gyro override release when script forcefully connects with connector)
+* vMod 9.4.4:
+* - Returned pathLen back to [pathLen <= 0.1f] under Guidance for better docking accuracy
+* - Changed aligning algorithm in Navigation to attempt better aligning when aligning directly
+* vMod 9.4.5:
+* - Scrapped the new aligning algorithm
+* vMod 9.4.6:
+* - Now scans blocks on the same grid as the programmable block.
+* vMod 9.4.7:
+* - Possible optimize of block scanning.
+* vMod 9.4.8:
+* - Made adjustments to leveling the ship when entering and exiting the planet
+* vMod 9.5.0:
+* - Added the ability to save docks of grids you don't own when docked to them (target grid must not move for this to work correctly)
+* vMod 9.5.1:
+* - Added the optional ability to name stations/grids that are added with the "add dock" command
+* vMod 9.5.2:
+* - Removed all unused references (warnings should disappear)
+* vMod 9.5.3:
+* - Modified waypoint parsing default speed (the difference shouldn't be noticable)
+* vMod 9.5.4:
+* - Fixed alignment issues

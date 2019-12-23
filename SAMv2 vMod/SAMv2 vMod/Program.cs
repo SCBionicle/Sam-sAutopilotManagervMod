@@ -18,7 +18,7 @@ namespace IngameScript
         //Modified by SCBionicle
         #region mdk preserve
         // Sam's Autopilot Manager
-        public static string VERSION = "2 vMod 9.5.3";
+        public static string VERSION = "2 vMod 9.5.4";
 
         //
         // Documentation: http://steamcommunity.com/sharedfiles/filedetails/?id=1653875433
@@ -1101,6 +1101,9 @@ namespace IngameScript
                 }
                 //Signal.Send(Signal.SignalType.UNDOCK);
                 //Logger.Info("Sending undock signal...");
+                undockPos = disconnectDock.stance.forward;
+                undockPos *= (Situation.radius + UNDOCK_DISTANCE);
+                undockPos += Situation.position;
                 if (disconnectDock.approachPath.Count > 0)
                 {
                     //*************************** Remove Below line if breaks *****************************//
@@ -1112,16 +1115,18 @@ namespace IngameScript
                     Vector3D direction2 = Vector3D.Normalize(newPos - taxiBeginPos);
                     Vector3D balancedDirection2 = Vector3D.ProjectOnPlane(ref direction2, ref Situation.gravityUpVector);
                     //*************************** Remove Below line if breaks *****************************//
-                    Navigation.AddWaypoint(taxiEndPos, balancedDirection2, Situation.gravityUpVector, APPROACH_SPEED, Waypoint.wpType.ALIGNING);
+                    if(!Situation.inGravity && Situation.alignDirectly)
+                        Navigation.AddWaypoint(taxiEndPos, direction2, Vector3D.Normalize(Vector3D.CalculatePerpendicularVector(direction2)),
+                            APPROACH_SPEED, Waypoint.wpType.ALIGNING);
+                    else
+                        Navigation.AddWaypoint(taxiEndPos, balancedDirection2, Situation.gravityUpVector, APPROACH_SPEED, Waypoint.wpType.ALIGNING);
                     foreach (VectorPath vp in disconnectDock.approachPath)
                     {
                         newPos = vp.position + (vp.direction * (APPROACH_SAFE_DISTANCE + Situation.radius));
                         Navigation.AddWaypoint(newPos, Vector3D.Zero, Vector3D.Zero, TAXIING_SPEED, Waypoint.wpType.TAXIING);
                     }
                 }
-                undockPos = disconnectDock.stance.forward;
-                undockPos *= (Situation.radius + UNDOCK_DISTANCE);
-                undockPos += Situation.position;
+                
                 direction = Vector3D.Normalize(Navigation.waypoints[0].stance.position - undockPos);
                 //Navigation.AddWaypoint(undockPos, balancedDirection, Situation.gravityUpVector, APPROACH_SPEED, Waypoint.wpType.ALIGNING); //original alignment
                 if (!Situation.inGravity && Situation.alignDirectly)
