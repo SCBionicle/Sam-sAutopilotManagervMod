@@ -25,3 +25,5 @@
 * - Modified waypoint parsing default speed (the difference shouldn't be noticable)
 * vMod 9.5.4:
 * - Fixed alignment issues
+* vMod 9.5.5:
+* - Fixed additional alignment issues

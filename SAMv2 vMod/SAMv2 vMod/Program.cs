@@ -18,7 +18,7 @@ namespace IngameScript
         //Modified by SCBionicle
         #region mdk preserve
         // Sam's Autopilot Manager
-        public static string VERSION = "2 vMod 9.5.4";
+        public static string VERSION = "2 vMod 9.5.5";
 
         //
         // Documentation: http://steamcommunity.com/sharedfiles/filedetails/?id=1653875433
@@ -1128,6 +1128,7 @@ namespace IngameScript
                 }
                 
                 direction = Vector3D.Normalize(Navigation.waypoints[0].stance.position - undockPos);
+                balancedDirection = Vector3D.Normalize(Vector3D.ProjectOnPlane(ref direction, ref Situation.gravityUpVector));
                 //Navigation.AddWaypoint(undockPos, balancedDirection, Situation.gravityUpVector, APPROACH_SPEED, Waypoint.wpType.ALIGNING); //original alignment
                 if (!Situation.inGravity && Situation.alignDirectly)
                 {
