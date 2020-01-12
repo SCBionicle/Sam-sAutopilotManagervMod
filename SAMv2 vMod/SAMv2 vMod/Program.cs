@@ -596,8 +596,7 @@ namespace IngameScript
                 else
                 {
                     Vector3D planetUpVector = Vector3D.Normalize(RemoteControl.block.GetNaturalGravity() * -1);
-                    //planetDirDifference = Vector3D.Dot(planetUpVector, Situation.forwardVector); //was Situation.forwardVector
-                    //Vector3D actualPlanetUpVector = Vector3D.Normalize(RemoteControl.block.GetNaturalGravity() * -1);
+                    
                     Vector3D desiredUpVector = Situation.upVector;
                     
                     if(waypoint.type == Waypoint.wpType.CONVERGING)
@@ -606,22 +605,7 @@ namespace IngameScript
                         newUpVector = Vector3D.Normalize(newUpVector);
                         desiredUpVector = newUpVector;
                     }
-                    //if (waypoint.type != Waypoint.wpType.NAVIGATING)
-                    //{
-                    //if (Situation.seaElevationVelocity < 0) planetUpVector *= -1;
-                    //   if (planetDirDifference > 0) planetUpVector *= -1; //with the change from (Situation.forwardVector), this was originally (planetDirDifference > 0) //also wasn't commented
-                    //   Vector3D virtUpVector = Vector3D.CalculatePerpendicularVector(Vector3D.Normalize(Vector3D.Cross(aimVector, planetUpVector))); //was aimVector, now is Situation.forwardVector (aimTarget was promising)
-                    //   desiredUpVector = virtUpVector;
-                    //   double planetUpDifference = Vector3D.Dot(virtUpVector, actualPlanetUpVector); //was vertUpVector, now situation.upVector
-                    //   if (planetUpDifference < 0) desiredUpVector = -virtUpVector; //was <
-                    //}
-
-                    // VV - if escaping nose up or entering nose down is more or less level with the planet, stay level to the planet (remove if breaks)
-                    // if (Math.Abs(planetDirDifference) < planetUpDiffThreshold)
-                    //{
-                    //    desiredUpVector = actualPlanetUpVector;
-                    //}
-                    //Logger.Log(Situation.seaElevationVelocity.ToString());
+                    
                     upVector = (desiredUp == Vector3D.Zero) ?
                         //Vector3D.CalculatePerpendicularVector(Vector3D.Normalize(Vector3D.Cross(aimVector, planetUpVector))) //was just working (abandoned due to strange orientation of dedicated servers
                         //Vector3D.Cross(aimVector, Vector3D.CalculatePerpendicularVector(Vector3D.Normalize(planetUpVector))) 
