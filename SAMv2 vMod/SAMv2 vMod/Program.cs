@@ -1959,10 +1959,6 @@ namespace IngameScript
                 str = Animation.Rotator() + (active ? NAV_HEADER_ACTIVE : NAV_HEADER_NOT_ACTIVE);
                 status = Navigation.Status();
                 str += "   " + ((status == "" && !Pilot.running) ? "disabled" : status) + "\n";
-                if (Situation.planetDetected)
-                {
-                    str += "Planet Detected\n";
-                }
                 if (selectedDocks.Count() == 0)
                 {
                     return str + "\n - No docks selected.\n   Use Configuration\n   screen to select\n   them.";
