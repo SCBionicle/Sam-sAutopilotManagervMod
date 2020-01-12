@@ -18,7 +18,7 @@ namespace IngameScript
         //Modified by SCBionicle
         #region mdk preserve
         // Sam's Autopilot Manager
-        public static string VERSION = "2 vMod 9.5.5";
+        public static string VERSION = "2 vMod 9.5.6";
 
         //
         // Documentation: http://steamcommunity.com/sharedfiles/filedetails/?id=1653875433
@@ -583,6 +583,7 @@ namespace IngameScript
                         aimTarget = Situation.position + aimVector * Situation.radius; //if breaks, remove this else restore only this line
                     }
                 }
+                Vector3D targetDirection = Vector3D.Normalize(aimTarget - Situation.position);
                 if (Situation.inGravity)
                 {
                     upVector = (desiredUp == Vector3D.Zero) ? Situation.gravityUpVector : desiredUp;
@@ -601,7 +602,7 @@ namespace IngameScript
                     
                     if(waypoint.type == Waypoint.wpType.CONVERGING)
                     {
-                        Vector3D newUpVector = Vector3D.ProjectOnPlane(ref Vector3D.Zero, ref aimTarget);
+                        Vector3D newUpVector = Vector3D.ProjectOnPlane(ref planetUpVector, ref targetDirection);
                         newUpVector = Vector3D.Normalize(newUpVector);
                         desiredUpVector = newUpVector;
                     }
