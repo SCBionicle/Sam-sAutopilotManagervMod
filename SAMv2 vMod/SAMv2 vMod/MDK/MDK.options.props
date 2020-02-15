@@ -9,7 +9,7 @@
       <Enabled>yes</Enabled>
     </MDKTrimTypes>
     <MDKMinify>
-      <Enabled>no</Enabled>
+      <Enabled>yes</Enabled>
     </MDKMinify>
     <MDKIgnore>
       <Folder>mdk</Folder>

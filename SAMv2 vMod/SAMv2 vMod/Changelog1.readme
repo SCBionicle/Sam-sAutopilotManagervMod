@@ -29,3 +29,5 @@
 * - Fixed additional alignment issues
 * vMod 9.5.6:
 * - Fix for entering and exiting planets with your nose up and down (you no longer will flip upside down unexpectedly)
+* vMod 9.6.0:
+* - Added "APPROACHING" tag for timers (great for retracting wings when you're about to dock)

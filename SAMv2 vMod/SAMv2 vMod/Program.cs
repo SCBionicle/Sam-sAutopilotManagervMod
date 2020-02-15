@@ -2354,7 +2354,7 @@ namespace IngameScript
             DOCK_SPEED_TAG, UNDOCK_DISTANCE_TAG, APPROACH_SPEED_TAG, APPROACH_SAFE_DISTANCE_TAG, ARRIVAL_SPEED_TAG, ARRIVAL_DISTANCE_TAG, ESCAPE_NOSE_UP_ELEVATION_TAG
             };
             private static string[] namedAttributes = new string[] { "Name" };
-            private static string[] timerTags = new string[] { "DOCKED", "NAVIGATED", "STARTED", "UNDOCKED" };
+            private static string[] timerTags = new string[] { "DOCKED", "NAVIGATED", "STARTED", "UNDOCKED", "APPROACHING" };
             public static Dictionary<Type, BlockProfile> perType = new Dictionary<Type, BlockProfile> { { typeof(IMyRemoteControl),
                     new BlockProfile(ref empty, ref empty, ref empty) },
                 { typeof(IMyCameraBlock),
@@ -2929,7 +2929,7 @@ namespace IngameScript
         }
         public static class Signal
         {
-            public enum SignalType { DOCK, NAVIGATION, START, UNDOCK };
+            public enum SignalType { DOCK, NAVIGATION, START, UNDOCK, APPROACH };
             public static HashSet<SignalType> list = new HashSet<SignalType>();
             public static long lastSignal = long.MaxValue;
             public static Program thisProgram;
@@ -3003,21 +3003,21 @@ namespace IngameScript
                     {
                         if (Block.HasProperty(entityID, "DOCKED") && Signal.list.Contains(Signal.SignalType.DOCK))
                         {
-                            Logger.Info("Timer triggered due to Docking accomplished");
+                            Logger.Info("Timer started due to Docking accomplished");
                             timer.StartCountdown();
                             sentSignal = true;
                             //timer.ApplyAction("Start");
                         }
                         if (Block.HasProperty(entityID, "NAVIGATED") && Signal.list.Contains(Signal.SignalType.NAVIGATION))
                         {
-                            Logger.Info("Timer triggered due to Navigation finished");
+                            Logger.Info("Timer started due to Navigation finished");
                             //timer.ApplyAction("Start");
                             timer.StartCountdown();
                             sentSignal = true;
                         }
                         if (Block.HasProperty(entityID, "STARTED") && Signal.list.Contains(Signal.SignalType.START))
                         {
-                            Logger.Info("Timer triggered due to Navigation start");
+                            Logger.Info("Timer started due to Navigation start");
                             timer.StartCountdown();
                             sentSignal = true;
                         }
@@ -3025,6 +3025,12 @@ namespace IngameScript
                         {
                             Logger.Info("Timer triggered due to undocking started");
                             timer.Trigger();
+                            sentSignal = true;
+                        }
+                        if (Block.HasProperty(entityID, "APPROACHING") && Signal.list.Contains(Signal.SignalType.APPROACH))
+                        {
+                            Logger.Info("Timer started due to approaching destination");
+                            timer.StartCountdown();
                             sentSignal = true;
                         }
                     }
