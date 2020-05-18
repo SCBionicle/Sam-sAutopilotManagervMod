@@ -31,3 +31,5 @@
 * - Fix for entering and exiting planets with your nose up and down (you no longer will flip upside down unexpectedly)
 * vMod 9.6.0:
 * - Added "APPROACHING" tag for timers (great for retracting wings when you're about to dock)
+* vMod 9.6.1:
+* - Fix for null connector exception when trying to dock when no connector was tagged
