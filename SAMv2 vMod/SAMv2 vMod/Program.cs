@@ -1001,12 +1001,13 @@ namespace IngameScript
             private static void CalculateApproach()
             {
                 connector = ConnectorControl.GetConnector(dock[0]);
-                bool reversedConnector = Block.HasProperty(connector.EntityId, CONNECTOR_REVERSE_TAG);
+                
                 if (connector == null)
                 {
                     Logger.Warn(MSG_NO_CONNECTORS_AVAILABLE);
                     return;
                 }
+                bool reversedConnector = Block.HasProperty(connector.EntityId, CONNECTOR_REVERSE_TAG);
                 Situation.RefreshParameters();
                 connectorToCenter = Situation.position - connector.GetPosition();
                 if (Math.Abs(Vector3D.Dot(dock[0].stance.forward, Situation.gravityUpVector)) < 0.5f)
