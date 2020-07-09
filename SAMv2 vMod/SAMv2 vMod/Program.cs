@@ -118,6 +118,8 @@ namespace IngameScript
 
         private static string MSG_NAVIGATION_TO = "Navigating to ";
 
+        private static string MSG_CRUISING_AT = "cruising at {0} m...";
+
         private static string MSG_NAVIGATION_TO_WAYPOINT = "Navigating to coordinates";
 
         private static string MSG_NAVIGATION_SUCCESSFUL = "Navigation successful!";
@@ -3818,7 +3820,7 @@ namespace IngameScript
         {
             public Stance stance;
             public float maxSpeed;
-            public enum wpType { ALIGNING, DOCKING, UNDOCKING, CONVERGING, APPROACHING, NAVIGATING, TESTING, TAXIING };
+            public enum wpType { ALIGNING, DOCKING, UNDOCKING, CONVERGING, APPROACHING, NAVIGATING, TESTING, TAXIING, CRUISING };
             public wpType type;
             public Waypoint(Stance s, float m, wpType wt)
             {
@@ -3844,6 +3846,10 @@ namespace IngameScript
                     case wpType.NAVIGATING: return MSG_NAVIGATING;
 
                     case wpType.TAXIING: return MSG_TAXIING;
+
+                    case wpType.CRUISING: return String.Format(MSG_CRUISING_AT, null);
+
+                    default: break;
 
                 }
                 return "Testing...";
