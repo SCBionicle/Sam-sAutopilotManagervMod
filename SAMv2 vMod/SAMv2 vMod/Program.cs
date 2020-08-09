@@ -328,6 +328,8 @@ namespace IngameScript
 
             private static Vector3D maxT;
 
+            public static double autoCruiseAltitude = double.NaN;
+
             public static double GetMaxThrust(Vector3D dir)
             {
                 forwardChange = Vector3D.Dot(dir, Situation.gridForwardVect);
@@ -820,6 +822,79 @@ namespace IngameScript
                 }
             }
 
+            private static void ProcessAutoCruise()
+            {
+                Vector3D gravityUp;
+                double seaLevelAltitude;
+                bool inGravity = false;
+                inGravity = RemoteControl.block?.TryGetPlanetElevation(MyPlanetElevation.Sealevel, out seaLevelAltitude) ?? false;
+                gravityUp = -RemoteControl.block?.GetNaturalGravity() ?? Vector3D.Zero;
+                Vector3D gravityUpNorm = Vector3D.Normalize(gravityUp);
+
+                
+
+                if(!double.IsNaN(Situation.autoCruiseAltitude) && inGravity)
+                {
+                    Vector3D ?desiredDock = Pilot.dock[0]?.stance.position;
+                    if (desiredDock == null)
+                    {
+                        StopAutoCruise();
+                        return;
+                    }
+                    Vector3D desiredDestination = desiredDock ?? Vector3D.NegativeInfinity;
+                    bool closeEnough = Vector3D.Distance(desiredDestination, Situation.position) < Situation.autoCruiseAltitude * 2;
+                    Vector3D dockDir = Vector3D.Normalize(desiredDestination - Situation.position);
+                    bool toAbove = Vector3D.Dot(dockDir, gravityUpNorm) > 0.1;
+                    if(!closeEnough && !toAbove && (waypoints[0].type & (Waypoint.wpType.CONVERGING | Waypoint.wpType.CRUISING | Waypoint.wpType.NAVIGATING)) != 0){
+                        Vector3D DesiredCruiseToPoint = Vector3D.Zero;
+                        #region Cruise Code
+
+
+                        //INSERT CRUISE CODE HERE
+
+
+                        #endregion
+                        SetCruisePos(DesiredCruiseToPoint);
+                        return;
+                    }
+                }
+                StopAutoCruise();
+            }
+
+            private static void StopAutoCruise()
+            {
+                if (waypoints[0]?.type == Waypoint.wpType.CRUISING)
+                {
+                    waypoints.RemoveAt(0);
+                }
+            }
+
+            private static void SetCruisePos(Vector3D pos)
+            {
+                Waypoint wp = new Waypoint(new Stance(pos, Vector3D.Zero, Vector3D.Zero), CONVERGING_SPEED, Waypoint.wpType.CRUISING);
+
+                switch (waypoints[0].type)
+                {
+                    case Waypoint.wpType.CRUISING:
+                        waypoints[0] = wp;
+                        return;
+                    case Waypoint.wpType.CONVERGING:
+                        waypoints.Insert(0, wp);
+                        return;
+                    case Waypoint.wpType.NAVIGATING:
+                        if (waypoints[1].type == Waypoint.wpType.CRUISING)
+                        {
+                            waypoints[1] = wp;
+                        }
+                        else if(waypoints[1].type == Waypoint.wpType.CONVERGING)
+                        {
+                            waypoints.Insert(1, wp);
+                        }
+                        return;
+                    default:
+                        return;
+                }
+            }
             public static void ResetArrival()
             {
                 IsClose = false;
@@ -888,6 +963,7 @@ namespace IngameScript
                 {
                     ProcessCloseness();
                 }
+                ProcessAutoCruise();
                 CheckColision();
                 Guidance.Set(waypoints.ElementAt(0));
                 Guidance.Tick();
@@ -2354,8 +2430,8 @@ namespace IngameScript
             private static string[] connectorTags = new string[] { CONNECTOR_REVERSE_TAG };
             private static string[] cockpitAttributes = new string[] { "Slot" };
             private static string[] pbAttributes = new string[] { "Name", "Speed", "Wait" , TAXI_SPEED_TAG, CONVERGING_SPEED_TAG, APPROACH_DISTANCE_TAG, DOCK_DISTANCE_TAG,
-            DOCK_SPEED_TAG, UNDOCK_DISTANCE_TAG, APPROACH_SPEED_TAG, APPROACH_SAFE_DISTANCE_TAG, ARRIVAL_SPEED_TAG, ARRIVAL_DISTANCE_TAG, ESCAPE_NOSE_UP_ELEVATION_TAG
-            };
+            DOCK_SPEED_TAG, UNDOCK_DISTANCE_TAG, APPROACH_SPEED_TAG, APPROACH_SAFE_DISTANCE_TAG, ARRIVAL_SPEED_TAG, ARRIVAL_DISTANCE_TAG, ESCAPE_NOSE_UP_ELEVATION_TAG,
+            "Auto_cruise"};
             private static string[] namedAttributes = new string[] { "Name" };
             private static string[] timerTags = new string[] { "DOCKED", "NAVIGATED", "STARTED", "UNDOCKED", "APPROACHING" };
             public static Dictionary<Type, BlockProfile> perType = new Dictionary<Type, BlockProfile> { { typeof(IMyRemoteControl),
@@ -3820,7 +3896,10 @@ namespace IngameScript
         {
             public Stance stance;
             public float maxSpeed;
-            public enum wpType { ALIGNING, DOCKING, UNDOCKING, CONVERGING, APPROACHING, NAVIGATING, TESTING, TAXIING, CRUISING };
+            [Flags]
+            public enum wpType { ALIGNING = 1 << 0, DOCKING = 1 << 1, UNDOCKING = 1 << 2,
+                CONVERGING = 1 << 3, APPROACHING = 1 << 4, NAVIGATING = 1 << 5, TESTING = 1 << 6,
+                TAXIING = 1 << 7, CRUISING = 1 << 8 };
             public wpType type;
             public Waypoint(Stance s, float m, wpType wt)
             {
