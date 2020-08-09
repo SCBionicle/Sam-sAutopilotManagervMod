@@ -190,6 +190,7 @@ namespace IngameScript
 
         private const string CONNECTOR_REVERSE_TAG = "REVERSE"; //Some modded connectors are placed backwards to work for some reason. It confuses this script.
                                                                 //^^ If the connector goes on backwards, add this tag to the connector to work around that. Use the BuildInfo mod to make sure that this is the case.
+        private const string AUTO_CRUISE_ATTRIBUTE = "Auto_cruise";
 
 
 
@@ -328,7 +329,7 @@ namespace IngameScript
 
             private static Vector3D maxT;
 
-            public static double autoCruiseAltitude = double.NaN;
+            public static double autoCruiseAltitude = double.PositiveInfinity;
 
             public static double GetMaxThrust(Vector3D dir)
             {
@@ -2431,7 +2432,7 @@ namespace IngameScript
             private static string[] cockpitAttributes = new string[] { "Slot" };
             private static string[] pbAttributes = new string[] { "Name", "Speed", "Wait" , TAXI_SPEED_TAG, CONVERGING_SPEED_TAG, APPROACH_DISTANCE_TAG, DOCK_DISTANCE_TAG,
             DOCK_SPEED_TAG, UNDOCK_DISTANCE_TAG, APPROACH_SPEED_TAG, APPROACH_SAFE_DISTANCE_TAG, ARRIVAL_SPEED_TAG, ARRIVAL_DISTANCE_TAG, ESCAPE_NOSE_UP_ELEVATION_TAG,
-            "Auto_cruise"};
+            AUTO_CRUISE_ATTRIBUTE};
             private static string[] namedAttributes = new string[] { "Name" };
             private static string[] timerTags = new string[] { "DOCKED", "NAVIGATED", "STARTED", "UNDOCKED", "APPROACHING" };
             public static Dictionary<Type, BlockProfile> perType = new Dictionary<Type, BlockProfile> { { typeof(IMyRemoteControl),
@@ -2856,6 +2857,25 @@ namespace IngameScript
                             Logger.Info("Escape nose up ground-to-air elevation changed to " + ESCAPE_NOSE_UP_ELEVATION);
                         }
                     }
+                }
+
+                string dist = string.Empty;
+                double outDist = Situation.autoCruiseAltitude;
+                if (Block.GetProperty(terminalBlock.EntityId, AUTO_CRUISE_ATTRIBUTE, ref dist))
+                {
+                    if (double.TryParse(dist, out outDist))
+                    {
+                        if (Situation.autoCruiseAltitude != (float)outDist)
+                        {
+                            Situation.autoCruiseAltitude = (float)outDist;
+                            Logger.Info($"Autocruise set to {Situation.autoCruiseAltitude:N0}.");
+                        }
+                    }
+                }
+                else if(!double.IsNaN(Situation.autoCruiseAltitude))
+                {
+                    Situation.autoCruiseAltitude = double.NaN;
+                    Logger.Info("Autocruise disabled. Atmospheric flight might be slow.");
                 }
 
                 bool noseUp = Block.HasProperty(terminalBlock.EntityId, ESCAPE_NOSE_UP_TAG);
