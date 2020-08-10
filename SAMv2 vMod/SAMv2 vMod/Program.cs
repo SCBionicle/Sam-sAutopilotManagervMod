@@ -828,13 +828,13 @@ namespace IngameScript
                 Vector3D gravityUp;
                 double seaLevelAltitude;
                 bool inGravity = false;
-                inGravity = RemoteControl.block?.TryGetPlanetElevation(MyPlanetElevation.Sealevel, out seaLevelAltitude) ?? false;
+                inGravity = RemoteControl.block?.TryGetPlanetElevation(MyPlanetElevation.Sealevel, out seaLevelAltitude) ?? false; //ways to bypass null pointers
                 gravityUp = -RemoteControl.block?.GetNaturalGravity() ?? Vector3D.Zero;
-                Vector3D gravityUpNorm = Vector3D.Normalize(gravityUp);
+                Vector3D gravityUpNorm = Vector3D.Normalize(gravityUp); //normalized vector of upwards gravity
 
                 
 
-                if(!double.IsNaN(Situation.autoCruiseAltitude) && inGravity)
+                if(!double.IsNaN(Situation.autoCruiseAltitude) && inGravity) //Is autocruise enabled and are you in a gravity well?
                 {
                     Vector3D ?desiredDock = Pilot.dock[0]?.stance.position;
                     if (desiredDock == null)
@@ -842,12 +842,12 @@ namespace IngameScript
                         StopAutoCruise();
                         return;
                     }
-                    Vector3D desiredDestination = desiredDock ?? Vector3D.NegativeInfinity;
-                    bool closeEnough = Vector3D.Distance(desiredDestination, Situation.position) < Situation.autoCruiseAltitude * 2;
-                    Vector3D dockDir = Vector3D.Normalize(desiredDestination - Situation.position);
-                    bool toAbove = Vector3D.Dot(dockDir, gravityUpNorm) > 0.1;
-                    if(!closeEnough && !toAbove && (waypoints[0].type & (Waypoint.wpType.CONVERGING | Waypoint.wpType.CRUISING | Waypoint.wpType.NAVIGATING)) != 0){
-                        Vector3D DesiredCruiseToPoint = Vector3D.Zero;
+                    Vector3D desiredDestination = desiredDock ?? Vector3D.NegativeInfinity; //You can trust this to be valid coordinate (needed a default value to satisfy the compiler)
+                    bool closeEnough = Vector3D.Distance(desiredDestination, Situation.position) < Situation.autoCruiseAltitude * 2; //Close enough to start descending?
+                    Vector3D dockDir = Vector3D.Normalize(desiredDestination - Situation.position); //Direction of the destination compared to the vessel in question
+                    bool toAbove = Vector3D.Dot(dockDir, gravityUpNorm) > 0.1; //Is the destination above the ship
+                    if(!closeEnough && !toAbove && (waypoints[0].type & (Waypoint.wpType.CONVERGING | Waypoint.wpType.CRUISING | Waypoint.wpType.NAVIGATING)) != 0){ //all conditions must be true to cruise
+                        Vector3D DesiredCruiseToPoint = Vector3D.Zero; //This is where SAM will try to got when cruising. Be sure to have this var set by the time your code exits
                         #region Cruise Code
 
 
@@ -855,7 +855,7 @@ namespace IngameScript
 
 
                         #endregion
-                        SetCruisePos(DesiredCruiseToPoint);
+                        SetCruisePos(DesiredCruiseToPoint); //Inserts cruising waypoint and edits existing ones
                         return;
                     }
                 }
@@ -870,6 +870,10 @@ namespace IngameScript
                 }
             }
 
+            /// <summary>
+            /// Inserts a cruising waypoint or edits the existing one in a way that it will not interrupt normal operation
+            /// </summary>
+            /// <param name="pos">The position for SAM to move to to maintain a cruise altitude</param>
             private static void SetCruisePos(Vector3D pos)
             {
                 Waypoint wp = new Waypoint(new Stance(pos, Vector3D.Zero, Vector3D.Zero), CONVERGING_SPEED, Waypoint.wpType.CRUISING);
