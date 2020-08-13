@@ -843,15 +843,27 @@ namespace IngameScript
                         return;
                     }
                     Vector3D desiredDestination = desiredDock ?? Vector3D.NegativeInfinity; //You can trust this to be valid coordinate (needed a default value to satisfy the compiler)
+                    Vector3D dockDirNotNormed = desiredDestination - Situation.position;
                     bool closeEnough = Vector3D.Distance(desiredDestination, Situation.position) < Situation.autoCruiseAltitude * 2; //Close enough to start descending?
-                    Vector3D dockDir = Vector3D.Normalize(desiredDestination - Situation.position); //Direction of the destination compared to the vessel in question
+                    Vector3D dockDir = Vector3D.Normalize(dockDirNotNormed); //Direction of the destination compared to the vessel in question
                     bool toAbove = Vector3D.Dot(dockDir, gravityUpNorm) > 0.1; //Is the destination above the ship
                     if(!closeEnough && !toAbove && (waypoints[0].type & (Waypoint.wpType.CONVERGING | Waypoint.wpType.CRUISING | Waypoint.wpType.NAVIGATING)) != 0){ //all conditions must be true to cruise
-                        Vector3D DesiredCruiseToPoint = Vector3D.Zero; //This is where SAM will try to got when cruising. Be sure to have this var set by the time your code exits
+                        Vector3D DesiredCruiseToPoint = Situation.position; //This is where SAM will try to got when cruising. Be sure to have this var set by the time your code exits
                         #region Cruise Code
+                        Vector3D dockDirGravityProj = Vector3D.ProjectOnPlane(ref dockDir, ref gravityUpNorm);
+                        Vector3D dockDirRightPerpendicular = Vector3D.Cross(Vector3D.Normalize(dockDirGravityProj), gravityUpNorm);
 
+                        #region Desired Climb Angle Calculations
+                        float climbAngle = float.NaN; //Set with some angle to climb and lower
+                        //Climb angle calculations here
+                        
 
-                        //INSERT CRUISE CODE HERE
+                        #endregion
+                        Vector3D intendedDirection = Vector3D.Transform(dockDirGravityProj, Quaternion.CreateFromAxisAngle(dockDirRightPerpendicular, climbAngle)); //not normed or at desired magnitude
+                        Vector3D intendedDirectionNorm = Vector3D.Normalize(intendedDirection);
+                        Vector3D intendedDistanceAsVector = dockDirNotNormed;
+                        Vector3D finalDirection = Vector3D.ProjectOnVector(ref intendedDistanceAsVector, ref intendedDirectionNorm);
+                        DesiredCruiseToPoint = Situation.position + finalDirection;
 
 
                         #endregion
