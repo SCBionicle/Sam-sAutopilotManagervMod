@@ -856,7 +856,7 @@ namespace IngameScript
                         #region Desired Climb Angle Calculations
                         float climbAngle = float.NaN; //Set with some angle to climb and lower
                         //Climb angle calculations here
-                        climbAngle = (float)((Situation.autoCruiseAltitude/Math.PI)*Math.Acos(2*(seaLevelAltitude/Situation.autoCruiseAltitude)-1));
+                        climbAngle = (float)(((Math.PI/2)/Math.PI)*Math.Acos(2*(seaLevelAltitude/Situation.autoCruiseAltitude)-1));
 
                         #endregion
                         Vector3D intendedDirection = Vector3D.Transform(dockDirGravityProj, Quaternion.CreateFromAxisAngle(dockDirRightPerpendicular, climbAngle)); //not normed or at desired magnitude
