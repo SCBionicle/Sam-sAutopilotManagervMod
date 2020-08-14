@@ -826,7 +826,7 @@ namespace IngameScript
             private static void ProcessAutoCruise()
             {
                 Vector3D gravityUp;
-                double seaLevelAltitude;
+                double seaLevelAltitude = double.NaN;
                 bool inGravity = false;
                 inGravity = RemoteControl.block?.TryGetPlanetElevation(MyPlanetElevation.Sealevel, out seaLevelAltitude) ?? false; //ways to bypass null pointers
                 gravityUp = -RemoteControl.block?.GetNaturalGravity() ?? Vector3D.Zero;
@@ -856,7 +856,7 @@ namespace IngameScript
                         #region Desired Climb Angle Calculations
                         float climbAngle = float.NaN; //Set with some angle to climb and lower
                         //Climb angle calculations here
-                        
+                        climbAngle = (float)((Situation.autoCruiseAltitude/Math.PI)*Math.Acos(2*(seaLevelAltitude/Situation.autoCruiseAltitude)-1));
 
                         #endregion
                         Vector3D intendedDirection = Vector3D.Transform(dockDirGravityProj, Quaternion.CreateFromAxisAngle(dockDirRightPerpendicular, climbAngle)); //not normed or at desired magnitude
