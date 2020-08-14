@@ -18,7 +18,7 @@ namespace IngameScript
         //Modified by SCBionicle
         #region mdk preserve
         // Sam's Autopilot Manager
-        public static string VERSION = "2 vMod 9.7.0 dev";
+        public static string VERSION = "2 vMod 9.7.1 dev";
 
         //
         // Documentation: http://steamcommunity.com/sharedfiles/filedetails/?id=1653875433
@@ -604,7 +604,7 @@ namespace IngameScript
                     
                     Vector3D desiredUpVector = Situation.upVector;
                     
-                    if(waypoint.type == Waypoint.wpType.CONVERGING)
+                    if(waypoint.type == Waypoint.wpType.CONVERGING || waypoint.type == Waypoint.wpType.CRUISING)
                     {
                         Vector3D newUpVector = Vector3D.ProjectOnPlane(ref planetUpVector, ref targetDirection);
                         newUpVector = Vector3D.Normalize(newUpVector);
@@ -676,7 +676,7 @@ namespace IngameScript
                     return;
 
                 }
-
+                Logger.Log($"Path length: {pathLen:N}");
                 //*********Remove this "if" if slow down doesn't work**************
                 //if (desiredSpeed < Situation.linearVelocity.Length() - BRAKE_THRUST_TRIGGER_DIFFERENCE)
                 //{
@@ -826,9 +826,8 @@ namespace IngameScript
             private static void ProcessAutoCruise()
             {
                 Vector3D gravityUp;
-                double seaLevelAltitude = double.NaN;
-                bool inGravity = false;
-                inGravity = RemoteControl.block?.TryGetPlanetElevation(MyPlanetElevation.Sealevel, out seaLevelAltitude) ?? false; //ways to bypass null pointers
+                double seaLevelAltitude = double.MinValue;
+                bool inGravity = RemoteControl.block?.TryGetPlanetElevation(MyPlanetElevation.Sealevel, out seaLevelAltitude) ?? false; //ways to bypass null pointers
                 gravityUp = -RemoteControl.block?.GetNaturalGravity() ?? Vector3D.Zero;
                 Vector3D gravityUpNorm = Vector3D.Normalize(gravityUp); //normalized vector of upwards gravity
 
@@ -848,16 +847,15 @@ namespace IngameScript
                     Vector3D dockDir = Vector3D.Normalize(dockDirNotNormed); //Direction of the destination compared to the vessel in question
                     bool toAbove = Vector3D.Dot(dockDir, gravityUpNorm) > 0.1; //Is the destination above the ship
                     if(!closeEnough && !toAbove && (waypoints[0].type & (Waypoint.wpType.CONVERGING | Waypoint.wpType.CRUISING | Waypoint.wpType.NAVIGATING)) != 0){ //all conditions must be true to cruise
-                        Vector3D DesiredCruiseToPoint = Situation.position; //This is where SAM will try to got when cruising. Be sure to have this var set by the time your code exits
+                        Vector3D DesiredCruiseToPoint; //This is where SAM will try to got when cruising. Be sure to have this var set by the time your code exits
                         #region Cruise Code
                         Vector3D dockDirGravityProj = Vector3D.ProjectOnPlane(ref dockDir, ref gravityUpNorm);
                         Vector3D dockDirRightPerpendicular = Vector3D.Cross(Vector3D.Normalize(dockDirGravityProj), gravityUpNorm);
-
                         #region Desired Climb Angle Calculations
-                        float climbAngle = float.NaN; //Set with some angle to climb and lower
-                        //Climb angle calculations here
-                        climbAngle = (float)(((Math.PI/2)/Math.PI)*Math.Acos(2*(seaLevelAltitude/Situation.autoCruiseAltitude)-1));
 
+                        //Climb angle calculations here
+                        float climbAngle = (float)(((Math.PI / 2) / Math.PI) * Math.Acos(2 * (seaLevelAltitude / Situation.autoCruiseAltitude) - 1));
+                        climbAngle = float.IsNaN(climbAngle) ? 0 : climbAngle;
                         #endregion
                         Vector3D intendedDirection = Vector3D.Transform(dockDirGravityProj, Quaternion.CreateFromAxisAngle(dockDirRightPerpendicular, climbAngle)); //not normed or at desired magnitude
                         Vector3D intendedDirectionNorm = Vector3D.Normalize(intendedDirection);
