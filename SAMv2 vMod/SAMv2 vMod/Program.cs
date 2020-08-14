@@ -497,7 +497,7 @@ namespace IngameScript
             private static float desiredSpeed = MAX_SPEED;
             private static Waypoint waypoint = null;
 
-            private static double planetDirDifference = 0;
+            //private static double planetDirDifference = 0;
 
             private const double planetUpDiffThreshold = 0.5;
 
@@ -596,7 +596,7 @@ namespace IngameScript
                 else if (!Situation.turnNoseUp) //was just an else (change this back to else if script breaks)
                 {
                     upVector = (desiredUp == Vector3D.Zero) ? Vector3D.Cross(aimVector, Situation.leftVector) : desiredUp;
-                    planetDirDifference = 0; //reset the diff so that it won't tilt the ship at the wrong time (when not in gravity well)
+                    //planetDirDifference = 0; //reset the diff so that it won't tilt the ship at the wrong time (when not in gravity well)
                 }
                 else
                 {
