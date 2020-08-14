@@ -118,7 +118,7 @@ namespace IngameScript
 
         private static string MSG_NAVIGATION_TO = "Navigating to ";
 
-        private static string MSG_CRUISING_AT = "cruising at {0} m...";
+        private static string MSG_CRUISING_AT = "cruising at {0:N} m...";
 
         private static string MSG_NAVIGATION_TO_WAYPOINT = "Navigating to coordinates";
 
@@ -3962,7 +3962,7 @@ namespace IngameScript
 
                     case wpType.TAXIING: return MSG_TAXIING;
 
-                    case wpType.CRUISING: return String.Format(MSG_CRUISING_AT, null);
+                    case wpType.CRUISING: return String.Format(MSG_CRUISING_AT, Situation.autoCruiseAltitude);
 
                     default: break;
 
