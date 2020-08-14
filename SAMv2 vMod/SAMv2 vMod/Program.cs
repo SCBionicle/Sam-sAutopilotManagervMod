@@ -847,7 +847,13 @@ namespace IngameScript
                     bool closeEnough = Vector3D.Distance(desiredDestination, Situation.position) < Situation.autoCruiseAltitude * 2; //Close enough to start descending?
                     Vector3D dockDir = Vector3D.Normalize(dockDirNotNormed); //Direction of the destination compared to the vessel in question
                     bool toAbove = Vector3D.Dot(dockDir, gravityUpNorm) > 0.1; //Is the destination above the ship
-                    if(!closeEnough && !toAbove && (waypoints[0].type & (Waypoint.wpType.CONVERGING | Waypoint.wpType.CRUISING | Waypoint.wpType.NAVIGATING)) != 0){ //all conditions must be true to cruise
+                    bool directlyBelow;
+                    if (Vector3D.Dot(dockDir, gravityUpNorm) < -0.8f && Vector3D.Distance(desiredDestination, Situation.position) < Vector3D.Distance(Situation.planetCenter, Situation.position))
+                        directlyBelow = true;
+                    else
+                        directlyBelow = false;
+
+                    if(!closeEnough && !toAbove && !directlyBelow && (waypoints[0].type & (Waypoint.wpType.CONVERGING | Waypoint.wpType.CRUISING | Waypoint.wpType.NAVIGATING)) != 0){ //all conditions must be true to cruise
                         Vector3D DesiredCruiseToPoint; //This is where SAM will try to got when cruising. Be sure to have this var set by the time your code exits
                         #region Cruise Code
                         Vector3D dockDirGravityProj = Vector3D.ProjectOnPlane(ref dockDir, ref gravityUpNorm);
