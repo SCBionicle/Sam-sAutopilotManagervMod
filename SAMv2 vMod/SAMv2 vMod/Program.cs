@@ -823,6 +823,7 @@ namespace IngameScript
                 }
             }
 
+            private static double altitudeGravityStart = 0;
             private static void ProcessAutoCruise()
             {
                 Vector3D gravityUp;
@@ -831,7 +832,7 @@ namespace IngameScript
                 gravityUp = -RemoteControl.block?.GetNaturalGravity() ?? Vector3D.Zero;
                 Vector3D gravityUpNorm = Vector3D.Normalize(gravityUp); //normalized vector of upwards gravity
 
-                
+                altitudeGravityStart = inGravity ? Math.Max(altitudeGravityStart, seaLevelAltitude) : 0;
 
                 if(!double.IsNaN(Situation.autoCruiseAltitude) && inGravity) //Is autocruise enabled and are you in a gravity well?
                 {
@@ -852,9 +853,18 @@ namespace IngameScript
                         Vector3D dockDirGravityProj = Vector3D.ProjectOnPlane(ref dockDir, ref gravityUpNorm);
                         Vector3D dockDirRightPerpendicular = Vector3D.Cross(Vector3D.Normalize(dockDirGravityProj), gravityUpNorm);
                         #region Desired Climb Angle Calculations
-
                         //Climb angle calculations here
-                        float climbAngle = (float)(((Math.PI / 2) / Math.PI) * Math.Acos(2 * (seaLevelAltitude / Situation.autoCruiseAltitude) - 1));
+                        float climbAngle;
+                        if (seaLevelAltitude <= Situation.autoCruiseAltitude)
+                        {
+                            climbAngle = (float)(((Math.PI / 4) / Math.PI) * Math.Acos(2 * (seaLevelAltitude / Situation.autoCruiseAltitude) - 1));
+                        }
+                        else
+                        {
+                            climbAngle = (float)(-((Math.PI / 2) / Math.PI) * Math.Acos(2 * 
+                                ((altitudeGravityStart - seaLevelAltitude) / (altitudeGravityStart - Situation.autoCruiseAltitude))));
+                        }
+
                         climbAngle = float.IsNaN(climbAngle) ? 0 : climbAngle;
                         #endregion
                         Vector3D intendedDirection = Vector3D.Transform(dockDirGravityProj, Quaternion.CreateFromAxisAngle(dockDirRightPerpendicular, climbAngle)); //not normed or at desired magnitude
