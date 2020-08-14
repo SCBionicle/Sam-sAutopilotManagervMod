@@ -676,7 +676,7 @@ namespace IngameScript
                     return;
 
                 }
-                Logger.Log($"Path length: {pathLen:N}");
+                //Logger.Log($"Path length: {pathLen:N}");
                 //*********Remove this "if" if slow down doesn't work**************
                 //if (desiredSpeed < Situation.linearVelocity.Length() - BRAKE_THRUST_TRIGGER_DIFFERENCE)
                 //{
