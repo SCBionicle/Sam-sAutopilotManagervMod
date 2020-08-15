@@ -848,7 +848,7 @@ namespace IngameScript
                     Vector3D dockDir = Vector3D.Normalize(dockDirNotNormed); //Direction of the destination compared to the vessel in question
                     bool toAbove = Vector3D.Dot(dockDir, gravityUpNorm) > 0.1; //Is the destination above the ship
                     bool directlyBelow;
-                    if (Vector3D.Dot(dockDir, gravityUpNorm) < -0.8f && Vector3D.Distance(desiredDestination, Situation.position) < Vector3D.Distance(Situation.planetCenter, Situation.position))
+                    if (Vector3D.Dot(dockDir, gravityUpNorm) < -0.95f && Vector3D.Distance(desiredDestination, Situation.position) < Vector3D.Distance(Situation.planetCenter, Situation.position))
                         directlyBelow = true;
                     else
                         directlyBelow = false;
