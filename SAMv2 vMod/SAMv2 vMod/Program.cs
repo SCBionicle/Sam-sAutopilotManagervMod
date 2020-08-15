@@ -861,16 +861,20 @@ namespace IngameScript
                         #region Desired Climb Angle Calculations
                         //Climb angle calculations here
                         float climbAngle;
-                        if (seaLevelAltitude <= Situation.autoCruiseAltitude)
-                        {
-                            climbAngle = (float)(((Math.PI / 4) / Math.PI) * Math.Acos(2 * (seaLevelAltitude / Situation.autoCruiseAltitude) - 1));
+                        if (seaLevelAltitude+100 <= Situation.autoCruiseAltitude)
+                        {                       //(Max angle rads) / ...
+                            climbAngle = (float)(((Math.PI / 4) / (Math.PI/2)) * Math.Acos(2 * (seaLevelAltitude / Situation.autoCruiseAltitude) - 1));
+                        }
+                        else if(seaLevelAltitude-100 >= Situation.autoCruiseAltitude)
+                        {                        //(Max angle rads) / ...
+                            climbAngle = (float)(-((Math.PI / 2) / (Math.PI/2)) * Math.Acos(2 * 
+                                ((altitudeGravityStart - seaLevelAltitude) / (altitudeGravityStart - Situation.autoCruiseAltitude))-1));
                         }
                         else
                         {
-                            climbAngle = (float)(-((Math.PI / 2) / Math.PI) * Math.Acos(2 * 
-                                ((altitudeGravityStart - seaLevelAltitude) / (altitudeGravityStart - Situation.autoCruiseAltitude))));
+                            climbAngle = 0;
                         }
-
+                        //Logger.Info($"Climb angle: {MathHelper.ToDegrees(climbAngle):N2}");
                         climbAngle = float.IsNaN(climbAngle) ? 0 : climbAngle;
                         #endregion
                         Vector3D intendedDirection = Vector3D.Transform(dockDirGravityProj, Quaternion.CreateFromAxisAngle(dockDirRightPerpendicular, climbAngle)); //not normed or at desired magnitude
