@@ -118,7 +118,7 @@ namespace IngameScript
 
         private static string MSG_NAVIGATION_TO = "Navigating to ";
 
-        private static string MSG_CRUISING_AT = "cruising at {0:N} m, climbing at {1:0N}°...";
+        private static string MSG_CRUISING_AT = "cruising at {0:N} m, climbing at {1:N0}°...";
 
         private static string MSG_NAVIGATION_TO_WAYPOINT = "Navigating to coordinates";
 
@@ -878,7 +878,7 @@ namespace IngameScript
                         {
                             ClimbAngle = 0;
                         }
-                        Logger.Info($"Climb angle: {MathHelper.ToDegrees(ClimbAngle):N2} -> {MathHelper.ToDegrees(MathHelperD.Clamp(ClimbAngle, maxDescentAngle, maxAscentAngle)):N2}");
+                        //Logger.Info($"Climb angle: {MathHelper.ToDegrees(ClimbAngle):N2} -> {MathHelper.ToDegrees(MathHelperD.Clamp(ClimbAngle, maxDescentAngle, maxAscentAngle)):N2}");
                         ClimbAngle = float.IsNaN(ClimbAngle) ? 0 : ClimbAngle;
                         ClimbAngle = (float)MathHelperD.Clamp(ClimbAngle, maxDescentAngle, maxAscentAngle);
                         #endregion
@@ -3985,7 +3985,7 @@ namespace IngameScript
 
                     case wpType.TAXIING: return MSG_TAXIING;
 
-                    case wpType.CRUISING: return String.Format(MSG_CRUISING_AT, Situation.autoCruiseAltitude, Navigation.ClimbAngle);
+                    case wpType.CRUISING: return String.Format(MSG_CRUISING_AT, Situation.autoCruiseAltitude, MathHelper.ToDegrees(Navigation.ClimbAngle));
 
                     default: break;
 
