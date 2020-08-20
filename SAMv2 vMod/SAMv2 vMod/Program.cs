@@ -1127,7 +1127,7 @@ namespace IngameScript
                 bool reversedConnector = Block.HasProperty(connector.EntityId, CONNECTOR_REVERSE_TAG);
                 Situation.RefreshParameters();
                 connectorToCenter = Situation.position - connector.GetPosition();
-                if (Math.Abs(Vector3D.Dot(dock[0].stance.forward, Situation.gravityUpVector)) < 0.5f)
+                if (Situation.gravityUpVector!=Vector3D.Zero && Math.Abs(Vector3D.Dot(dock[0].stance.forward, Situation.gravityUpVector)) < 0.5f)
                 {
                     up = Situation.gravityUpVector;
                     referenceUp = connector.WorldMatrix.GetDirectionVector(connector.WorldMatrix.GetClosestDirection(up));
