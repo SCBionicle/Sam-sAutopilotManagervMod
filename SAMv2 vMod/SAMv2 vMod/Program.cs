@@ -840,7 +840,7 @@ namespace IngameScript
 
                 if(!double.IsNaN(Situation.autoCruiseAltitude) && inGravity) //Is autocruise enabled and are you in a gravity well?
                 {
-                    Vector3D ?desiredDock = Pilot.dock[0]?.stance.position;
+                    Vector3D ?desiredDock = Pilot.dock.Count>0 ? Pilot.dock[0]?.stance.position : null;
                     if (desiredDock == null)
                     {
                         StopAutoCruise();
