@@ -783,6 +783,7 @@ namespace IngameScript
                         break;
 
                     case Waypoint.wpType.NAVIGATING: break;
+                    case Waypoint.wpType.CRUISING: break;
 
                     default: return;
 
@@ -833,6 +834,8 @@ namespace IngameScript
                 Vector3D gravityUpNorm = Vector3D.Normalize(gravityUp); //normalized vector of upwards gravity
 
                 altitudeGravityStart = inGravity ? Math.Max(altitudeGravityStart, seaLevelAltitude) : 0;
+                const float maxDescentAngle = (float) -Math.PI / 2;
+                const float maxAscentAngle = (float) Math.PI / 4;
 
                 if(!double.IsNaN(Situation.autoCruiseAltitude) && inGravity) //Is autocruise enabled and are you in a gravity well?
                 {
@@ -874,8 +877,9 @@ namespace IngameScript
                         {
                             climbAngle = 0;
                         }
-                        //Logger.Info($"Climb angle: {MathHelper.ToDegrees(climbAngle):N2}");
+                        Logger.Info($"Climb angle: {MathHelper.ToDegrees(climbAngle):N2} -> {MathHelper.ToDegrees(MathHelperD.Clamp(climbAngle, maxDescentAngle, maxAscentAngle)):N2}");
                         climbAngle = float.IsNaN(climbAngle) ? 0 : climbAngle;
+                        climbAngle = (float)MathHelperD.Clamp(climbAngle, maxDescentAngle, maxAscentAngle);
                         #endregion
                         Vector3D intendedDirection = Vector3D.Transform(dockDirGravityProj, Quaternion.CreateFromAxisAngle(dockDirRightPerpendicular, climbAngle)); //not normed or at desired magnitude
                         Vector3D intendedDirectionNorm = Vector3D.Normalize(intendedDirection);
