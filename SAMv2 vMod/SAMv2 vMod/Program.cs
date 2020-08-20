@@ -18,7 +18,7 @@ namespace IngameScript
         //Modified by SCBionicle
         #region mdk preserve
         // Sam's Autopilot Manager
-        public static string VERSION = "2 vMod 9.7.1 dev";
+        public static string VERSION = "2 vMod 9.7.1.3 dev";
 
         //
         // Documentation: http://steamcommunity.com/sharedfiles/filedetails/?id=1653875433
