@@ -118,7 +118,7 @@ namespace IngameScript
 
         private static string MSG_NAVIGATION_TO = "Navigating to ";
 
-        private static string MSG_CRUISING_AT = "cruising at {0:N} m...";
+        private static string MSG_CRUISING_AT = "cruising at {0:N} m, climbing at {1:0N}°...";
 
         private static string MSG_NAVIGATION_TO_WAYPOINT = "Navigating to coordinates";
 
@@ -825,6 +825,7 @@ namespace IngameScript
             }
 
             private static double altitudeGravityStart = 0;
+            public static float ClimbAngle = 0;
             private static void ProcessAutoCruise()
             {
                 Vector3D gravityUp;
@@ -863,25 +864,25 @@ namespace IngameScript
                         Vector3D dockDirRightPerpendicular = Vector3D.Cross(Vector3D.Normalize(dockDirGravityProj), gravityUpNorm);
                         #region Desired Climb Angle Calculations
                         //Climb angle calculations here
-                        float climbAngle;
+                        //float climbAngle;
                         if (seaLevelAltitude+100 <= Situation.autoCruiseAltitude)
                         {                       //(Max angle rads) / ...
-                            climbAngle = (float)(((Math.PI / 4) / (Math.PI/2)) * Math.Acos(2 * (seaLevelAltitude / Situation.autoCruiseAltitude) - 1));
+                            ClimbAngle = (float)(((Math.PI / 4) / (Math.PI/2)) * Math.Acos(2 * (seaLevelAltitude / Situation.autoCruiseAltitude) - 1));
                         }
                         else if(seaLevelAltitude-100 >= Situation.autoCruiseAltitude)
                         {                        //(Max angle rads) / ...
-                            climbAngle = (float)(-((Math.PI / 2) / (Math.PI/2)) * Math.Acos(2 * 
+                            ClimbAngle = (float)(-((Math.PI / 2) / (Math.PI/2)) * Math.Acos(2 * 
                                 ((altitudeGravityStart - seaLevelAltitude) / (altitudeGravityStart - Situation.autoCruiseAltitude))-1));
                         }
                         else
                         {
-                            climbAngle = 0;
+                            ClimbAngle = 0;
                         }
-                        Logger.Info($"Climb angle: {MathHelper.ToDegrees(climbAngle):N2} -> {MathHelper.ToDegrees(MathHelperD.Clamp(climbAngle, maxDescentAngle, maxAscentAngle)):N2}");
-                        climbAngle = float.IsNaN(climbAngle) ? 0 : climbAngle;
-                        climbAngle = (float)MathHelperD.Clamp(climbAngle, maxDescentAngle, maxAscentAngle);
+                        Logger.Info($"Climb angle: {MathHelper.ToDegrees(ClimbAngle):N2} -> {MathHelper.ToDegrees(MathHelperD.Clamp(ClimbAngle, maxDescentAngle, maxAscentAngle)):N2}");
+                        ClimbAngle = float.IsNaN(ClimbAngle) ? 0 : ClimbAngle;
+                        ClimbAngle = (float)MathHelperD.Clamp(ClimbAngle, maxDescentAngle, maxAscentAngle);
                         #endregion
-                        Vector3D intendedDirection = Vector3D.Transform(dockDirGravityProj, Quaternion.CreateFromAxisAngle(dockDirRightPerpendicular, climbAngle)); //not normed or at desired magnitude
+                        Vector3D intendedDirection = Vector3D.Transform(dockDirGravityProj, Quaternion.CreateFromAxisAngle(dockDirRightPerpendicular, ClimbAngle)); //not normed or at desired magnitude
                         Vector3D intendedDirectionNorm = Vector3D.Normalize(intendedDirection);
                         Vector3D intendedDistanceAsVector = dockDirNotNormed;
                         Vector3D finalDirection = Vector3D.ProjectOnVector(ref intendedDistanceAsVector, ref intendedDirectionNorm);
@@ -3891,7 +3892,7 @@ namespace IngameScript
             {
                 var parts = str.Split(':');
                 Vector3D v = Vector3D.Zero;
-                if (parts.Length != 6)
+                if (parts.Length != 7)
                 {
                     return v;
 
@@ -3984,7 +3985,7 @@ namespace IngameScript
 
                     case wpType.TAXIING: return MSG_TAXIING;
 
-                    case wpType.CRUISING: return String.Format(MSG_CRUISING_AT, Situation.autoCruiseAltitude);
+                    case wpType.CRUISING: return String.Format(MSG_CRUISING_AT, Situation.autoCruiseAltitude, Navigation.ClimbAngle);
 
                     default: break;
 
@@ -3998,7 +3999,7 @@ namespace IngameScript
             {
                 string[] segment = coordinates.Split(':');
                 //Logger.Info($"GPS --- {coordinates}");
-                if (segment.Length == 6)
+                if (segment.Length == 7)
                 {
                     Waypoint wp = FromString(coordinates);
                     Dock dock = Dock.NewDock(wp, segment[1]);
