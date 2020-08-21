@@ -33,3 +33,8 @@
 * - Added "APPROACHING" tag for timers (great for retracting wings when you're about to dock)
 * vMod 9.6.1:
 * - Fix for null connector exception when trying to dock when no connector was tagged
+* vMod 10.0.0:
+* - Added new feature, "Auto cruise". You can now go to a specified cruising altitude on planets to get from point A to B faster.
+*		No more crashing into terrain when you destination is on the opposite side of the planet.
+* - Updated GPS to use new format that Keen has changed. GPS will now work without workarounds.
+* - Fixed misaligned dock jank that happened in space.
