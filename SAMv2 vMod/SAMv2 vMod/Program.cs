@@ -61,7 +61,7 @@ namespace IngameScript
 
         private static float HORIZONT_CHECK_DISTANCE = 2000.0f;
 
-        private static float MAX_SPEED = 95.0f; //Speed when navigating (this is done during collision avoidance, not actually top speed)
+        private static float MAX_SPEED = 80.0f; //Speed when navigating (this is done during collision avoidance, not actually top speed)
                                                 //^^ Tag: Speed
 
         private static float APPROACH_DISTANCE = 20.0f; //How close to approach the runway/landing pad
@@ -76,7 +76,7 @@ namespace IngameScript
 
         private static float APPROACH_SAFE_DISTANCE = 5.0f; //how far away the ship hovers from the taxi points (Tag: Taxi_distance)
 
-        private static float CONVERGING_SPEED = 10f; //How fast the ship should go when no objects are in the ship's path
+        private static float CONVERGING_SPEED = 100f; //How fast the ship should go when no objects are in the ship's path
 
         private static float TAXIING_SPEED = 2.0f; //Speed of which the ship goes while taxiing to its connector (low speed recommended)
 
