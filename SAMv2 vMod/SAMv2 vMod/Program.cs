@@ -824,6 +824,16 @@ namespace IngameScript
                 }
             }
 
+            public static Waypoint NextWaypointOfType(Waypoint.wpType type)
+            {
+                foreach(Waypoint w in waypoints)
+                {
+                    if (w.type == type)
+                        return w;
+                }
+                return null;
+            }
+
             private static double altitudeGravityStart = 0;
             public static float ClimbAngle = 0;
             private static void ProcessAutoCruise()
@@ -840,7 +850,8 @@ namespace IngameScript
 
                 if(!double.IsNaN(Situation.autoCruiseAltitude) && inGravity) //Is autocruise enabled and are you in a gravity well?
                 {
-                    Vector3D ?desiredDock = Pilot.dock.Count>0 ? Pilot.dock[0]?.stance.position : null;
+                    //Vector3D ?desiredDock = Pilot.dock.Count>0 ? Pilot.dock[0]?.stance.position : null;
+                    Vector3D? desiredDock = NextWaypointOfType(Waypoint.wpType.CONVERGING)?.stance?.position;
                     if (desiredDock == null)
                     {
                         StopAutoCruise();
