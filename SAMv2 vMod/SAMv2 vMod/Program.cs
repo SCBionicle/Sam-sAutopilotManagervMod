@@ -974,7 +974,8 @@ namespace IngameScript
             {
                 if (ArrivalWaypoint == null)
                 {
-                    foreach (Waypoint w in waypoints)
+                    ArrivalWaypoint = waypoints.Last(delegate (Waypoint w) { return w.type == Waypoint.wpType.CONVERGING; });
+                    /*foreach (Waypoint w in waypoints)
                     {
                         if (w.type == Waypoint.wpType.CONVERGING || w.type == Waypoint.wpType.NAVIGATING)
                         {
@@ -982,7 +983,7 @@ namespace IngameScript
 
                             break;
                         }
-                    }
+                    }*/
                     return false;
                 }
                 if (IsClose)
@@ -993,6 +994,7 @@ namespace IngameScript
                     if ((destination - Situation.position).Length() <= ARRIVAL_DISTANCE)
                     {
                         Logger.Info("Slowing due to arriving at destination.");
+                        Signal.Send(Signal.SignalType.APPROACH);
                         IsClose = true;
                         return true;
                     }
