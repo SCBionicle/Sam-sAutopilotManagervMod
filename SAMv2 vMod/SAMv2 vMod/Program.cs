@@ -3045,7 +3045,7 @@ namespace IngameScript
             foreach (IMyTerminalBlock block in GridBlocks.terminalBlocks)
             {
                 //************** Remove Text Panel check if script breaks *************
-                if (block.CubeGrid != Me.CubeGrid && !(block is IMyTextPanel))
+                if (block.CubeGrid != Me.CubeGrid && !(block is IMyTextPanel) && !(block is IMyShipConnector))
                 {
                     //********** Uncomment below if script breaks ********
                     continue;
