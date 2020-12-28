@@ -41,3 +41,4 @@
 * vMod 10.0.1:
 * - Fixed approach timer not firing
 * - Added the ability for connectors to be on subgrids as long as it's the same construct
+* - Optimized arrival slowdown to be more accurate
