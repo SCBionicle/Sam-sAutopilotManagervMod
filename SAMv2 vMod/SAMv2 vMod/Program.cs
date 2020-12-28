@@ -2945,6 +2945,7 @@ namespace IngameScript
                 {
                     Logger.Warn($"Nose down elevation not set. Matching nose up elevation...");
                     Logger.Info("Use the custom data to set nose up elevation");
+                    Logger.Info($"Custom data reference: SAM.{DESCEND_NOSE_DOWN_ELEVATION_TAG}=<number>");
                     Situation.noseDownElevation = ESCAPE_NOSE_UP_ELEVATION;
                 }
 
