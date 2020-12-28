@@ -184,6 +184,8 @@ namespace IngameScript
 
         private const string ESCAPE_NOSE_UP_ELEVATION_TAG = "Nose_up_elevation";
 
+        private const string DESCEND_NOSE_DOWN_ELEVATION_TAG = "Nose_down_elevation";
+
         private const string SLOW_ON_APPROACH_TAG = "SLOWONAPPROACH"; //slows the ship to taxiing speed when closing in onto the runway or docking connector
 
         private const string ALLOW_DIRECT_ALIGNMENT_TAG = "ALLOWDIRECTALIGNMENT"; //In space, should the ship point directly at the destination on navigation started before taking off?
@@ -274,6 +276,8 @@ namespace IngameScript
             public static bool inGravity; //false when sufficiantly elevated above ground when "allowEscapeNoseUp" is turned on
 
             public static bool turnNoseUp; //true when in gravity but nose would be up
+
+            public static float noseDownElevation = ESCAPE_NOSE_UP_ELEVATION;
 
             public static bool allowEscapeNoseUp;
 
@@ -385,20 +389,35 @@ namespace IngameScript
                 inGravity = naturalGravity.Length() >= 0.5;
                 if (inGravity)
                 {
-                    seaElevationVelocity = Vector3D.Dot(Vector3D.Normalize(linearVelocity), Vector3D.Normalize(naturalGravity));
+                    seaElevationVelocity = Vector3D.Dot(linearVelocity, -Vector3D.Normalize(naturalGravity));
                 }
                 if (allowEscapeNoseUp && inGravity)
                 {
                     double groundElevation = 0;
                     RemoteControl.block.TryGetPlanetElevation(MyPlanetElevation.Surface, out groundElevation);
-                    if (groundElevation > ESCAPE_NOSE_UP_ELEVATION)
+                    if (seaElevationVelocity > 0)
                     {
-                        inGravity = false;
-                        turnNoseUp = true;
+                        if (groundElevation > ESCAPE_NOSE_UP_ELEVATION)
+                        {
+                            inGravity = false;
+                            turnNoseUp = true;
+                        }
+                        else
+                        {
+                            turnNoseUp = false;
+                        }
                     }
-                    else
+                    else if(seaElevationVelocity < 0)
                     {
-                        turnNoseUp = false;
+                        if (groundElevation > noseDownElevation)
+                        {
+                            inGravity = false;
+                            turnNoseUp = true;
+                        }
+                        else
+                        {
+                            turnNoseUp = false;
+                        }
                     }
                 }
                 else
@@ -2484,7 +2503,7 @@ namespace IngameScript
             private static string[] cockpitAttributes = new string[] { "Slot" };
             private static string[] pbAttributes = new string[] { "Name", "Speed", "Wait" , TAXI_SPEED_TAG, CONVERGING_SPEED_TAG, APPROACH_DISTANCE_TAG, DOCK_DISTANCE_TAG,
             DOCK_SPEED_TAG, UNDOCK_DISTANCE_TAG, APPROACH_SPEED_TAG, APPROACH_SAFE_DISTANCE_TAG, ARRIVAL_SPEED_TAG, ARRIVAL_DISTANCE_TAG, ESCAPE_NOSE_UP_ELEVATION_TAG,
-            AUTO_CRUISE_ATTRIBUTE};
+            AUTO_CRUISE_ATTRIBUTE, DESCEND_NOSE_DOWN_ELEVATION_TAG};
             private static string[] namedAttributes = new string[] { "Name" };
             private static string[] timerTags = new string[] { "DOCKED", "NAVIGATED", "STARTED", "UNDOCKED", "APPROACHING" };
             public static Dictionary<Type, BlockProfile> perType = new Dictionary<Type, BlockProfile> { { typeof(IMyRemoteControl),
@@ -2899,7 +2918,7 @@ namespace IngameScript
                     }
                 }
 
-                if (Block.GetProperty(terminalBlock.EntityId, ESCAPE_NOSE_UP_ELEVATION_TAG, ref speed))
+                if (Block.GetProperty(terminalBlock.EntityId, ESCAPE_NOSE_UP_ELEVATION_TAG, ref speed) && Situation.allowEscapeNoseUp)
                 {
                     if (Int32.TryParse(speed, out speedInt))
                     {
@@ -2909,6 +2928,24 @@ namespace IngameScript
                             Logger.Info("Escape nose up ground-to-air elevation changed to " + ESCAPE_NOSE_UP_ELEVATION);
                         }
                     }
+                }
+
+                if (Block.GetProperty(terminalBlock.EntityId, DESCEND_NOSE_DOWN_ELEVATION_TAG, ref speed) && Situation.allowEscapeNoseUp)
+                {
+                    if (Int32.TryParse(speed, out speedInt))
+                    {
+                        if (Situation.noseDownElevation != (float)speedInt)
+                        {
+                            Situation.noseDownElevation = (float)speedInt;
+                            Logger.Info($"Descend nose down ground-to-air elevation changed to {Situation.noseDownElevation:N0}");
+                        }
+                    }
+                }
+                else if (Situation.noseDownElevation != ESCAPE_NOSE_UP_ELEVATION && Situation.allowEscapeNoseUp)
+                {
+                    Logger.Warn($"Nose down elevation not set. Matching nose up elevation...");
+                    Logger.Info("Use the custom data to set nose up elevation");
+                    Situation.noseDownElevation = ESCAPE_NOSE_UP_ELEVATION;
                 }
 
                 string dist = string.Empty;
