@@ -3272,7 +3272,10 @@ namespace IngameScript
                     if (connector.Status == MyShipConnectorStatus.Connected)
                     {
                         connected = true;
-
+                        if (!connector.OtherConnector.CubeGrid.IsStatic)
+                        {
+                            RemoteControl.block.DampenersOverride = false;
+                        }
                     }
                 }
                 return connected;
