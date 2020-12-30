@@ -38,7 +38,9 @@
 *		No more crashing into terrain when you destination is on the opposite side of the planet.
 * - Updated GPS to use new format that Keen has changed. GPS will now work without workarounds.
 * - Fixed misaligned dock jank that happened in space.
-* vMod 10.0.1:
+* vMod 10.1.0:
 * - Fixed approach timer not firing
 * - Added the ability for connectors to be on subgrids as long as it's the same construct
 * - Optimized arrival slowdown to be more accurate
+* - Added separate nose up and nose down elevations
+* - Inertial dampeners will be deactivated when docking with a nonstatic grid
