@@ -18,7 +18,7 @@ namespace IngameScript
         //Modified by SCBionicle
         #region mdk preserve
         // Sam's Autopilot Manager
-        public static string VERSION = "2 vMod 10.1.0";
+        public static string VERSION = "2 vMod 10.1.1";
 
         //
         // Documentation: http://steamcommunity.com/sharedfiles/filedetails/?id=1653875433
@@ -1013,7 +1013,7 @@ namespace IngameScript
                     if ((destination - Situation.position).Length() <= ARRIVAL_DISTANCE)
                     {
                         Logger.Info("Slowing due to arriving at destination.");
-                        Signal.Send(Signal.SignalType.APPROACH);
+                        //Signal.Send(Signal.SignalType.APPROACH);
                         IsClose = true;
                         return true;
                     }
@@ -1157,6 +1157,7 @@ namespace IngameScript
                     Logger.Warn(MSG_NO_CONNECTORS_AVAILABLE);
                     return;
                 }
+                Signal.Send(Signal.SignalType.APPROACH);
                 bool reversedConnector = Block.HasProperty(connector.EntityId, CONNECTOR_REVERSE_TAG);
                 Situation.RefreshParameters();
                 connectorToCenter = Situation.position - connector.GetPosition();

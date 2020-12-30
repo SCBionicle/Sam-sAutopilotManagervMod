@@ -44,3 +44,5 @@
 * - Optimized arrival slowdown to be more accurate
 * - Added separate nose up and nose down elevations
 * - Inertial dampeners will be deactivated when docking with a nonstatic grid
+* vMod 10.1.1:
+* - Patched approaching timer to fire at the proper time, not when arriving, but when docking starts
