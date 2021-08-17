@@ -1681,6 +1681,21 @@ namespace IngameScript
                     case "SCAN":
                         ScanGrid();
                         break;
+                    case "CLIMB":
+                        int change;
+                        if(!int.TryParse(arg1, out change))
+                        {
+                            Logger.Err("Climb argument is not an integer.");
+                            break;
+                        }
+                        if (!Situation.planetDetected)
+                        {
+                            Logger.Err("Unable to execute, not in gravity well.");
+                            break;
+                        }
+
+                        Pilot.Ascend(change);
+                        break;
                     default:
                         Logger.Err("Unknown command ->" + arg0 + "<-");
                         break;
