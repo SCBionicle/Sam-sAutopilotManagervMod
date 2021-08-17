@@ -1077,6 +1077,21 @@ namespace IngameScript
                 return waypoints.Count == 0;
 
             }
+
+            /// <summary>
+            /// Gets the vectorless position above or below the ship within a gravity well
+            /// </summary>
+            /// <param name="distance">distance in meters, positive means ascend</param>
+            /// <returns>Stance (vectorless), null if not in planet</returns>
+            public static Stance GetPlanetaryVerticalStance(int distance)
+            {
+                if (!Situation.planetDetected) { return null; }
+
+                Vector3D planetaryUpVector = -Vector3D.Normalize(Situation.naturalGravity);
+
+                Vector3D newPos = Situation.position + planetaryUpVector * distance;
+                return new Stance(newPos, Vector3D.Zero, Vector3D.Zero);
+            }
         }
         public static class Pilot
         {
