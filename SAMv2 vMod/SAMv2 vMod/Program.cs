@@ -134,6 +134,10 @@ namespace IngameScript
 
         private static string MSG_INVALID_GPS_TYPE = "Invalid GPS format!";
 
+        private static string MSG_ASCENDING_BY = "Ascending by {0:N0}m...";
+
+        private static string MSG_DESCENDING_BY = "Descending by {0:N0}m...";
+
         private static float HORIZONT_CHECK_ANGLE_LIMIT = (float)Math.PI / 32.0f;
 
         private static float HORIZONT_CHECK_ANGLE_STEP = (float)Math.PI / 75.0f;
@@ -1432,6 +1436,24 @@ namespace IngameScript
                 }
                 Start();
 
+            }
+
+            /// <summary>
+            /// Starts autopilot session of vertical movement.
+            /// 
+            /// <code>Assumes planetary check is already done</code>
+            /// </summary>
+            /// <seealso cref="Navigation.GetPlanetaryVerticalStance(int)"/>
+            /// <param name="distance">positive is ascension</param>
+            public static void Ascend(int distance)
+            {
+                Stance newPosition = Navigation.GetPlanetaryVerticalStance(distance);
+
+                Dock goal = Dock.NewDock(newPosition, "Vertical navigation");
+                string msg = distance > 0 ? String.Format(MSG_ASCENDING_BY, distance) : string.Format(MSG_DESCENDING_BY, -distance);
+                Logger.Log(msg);
+
+                Start(goal);
             }
         }
         private IMyBroadcastListener listener;
