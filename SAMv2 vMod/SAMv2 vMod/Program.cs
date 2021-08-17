@@ -1719,6 +1719,7 @@ namespace IngameScript
                         ScanGrid();
                         break;
                     case "CLIMB":
+                        Situation.RefreshParameters();
                         int change;
                         if(!int.TryParse(arg1, out change))
                         {
