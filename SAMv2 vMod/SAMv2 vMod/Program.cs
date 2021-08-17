@@ -1260,6 +1260,17 @@ namespace IngameScript
                     {
                         Navigation.AddWaypoint(Situation.position, balancedDirection, Situation.gravityUpVector, APPROACH_SPEED, Waypoint.wpType.ALIGNING);
                     }
+
+                    double groundElevation = double.NaN;
+                    RemoteControl.block.TryGetPlanetElevation(MyPlanetElevation.Surface, out groundElevation);
+                    if (Situation.planetDetected && groundElevation>0 && groundElevation<Situation.radius)
+                    {
+                        Stance newPos = Navigation.GetPlanetaryVerticalStance((int)Math.Round(Situation.radius + UNDOCK_DISTANCE));
+                        newPos.forward = Vector3D.Normalize(Vector3D.ProjectOnPlane(ref Situation.forwardVector, ref Situation.gravityUpVector));
+                        newPos.up = Situation.gravityUpVector;
+
+                        Navigation.AddWaypoint(newPos, DOCK_SPEED, Waypoint.wpType.UNDOCKING);
+                    }
                     return;
                 }
                 //Signal.Send(Signal.SignalType.UNDOCK);
