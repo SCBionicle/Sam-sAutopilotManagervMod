@@ -1082,6 +1082,7 @@ namespace IngameScript
         {
             public static bool running = false;
             public static List<Dock> dock = new List<Dock>();
+            private const int MINIMUM_DISTANCE_TO_APPROACH = 400;
             public static void Tick()
             {
                 if (!running)
@@ -1109,10 +1110,15 @@ namespace IngameScript
                 }
                 if (Navigation.Done())
                 {
-                    if (dock.Count != 0 && dock[0].gridEntityId != 0)
+                    bool isPhysicalDock = dock.Count != 0 && dock[0].gridEntityId != 0;
+                    if (isPhysicalDock && Vector3D.Distance(Situation.position,dock[0].stance.position) < MINIMUM_DISTANCE_TO_APPROACH)
                     {
                         CalculateApproach();
                         dock.Clear();
+                        return;
+                    }else if (isPhysicalDock)
+                    {
+                        SetEndStance(dock[0]);
                         return;
                     }
                     Logger.Info(MSG_NAVIGATION_SUCCESSFUL);
