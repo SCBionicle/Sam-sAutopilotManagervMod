@@ -1254,7 +1254,8 @@ namespace IngameScript
                 undockPos = disconnectDock.stance.forward;
                 undockPos *= (Situation.radius + UNDOCK_DISTANCE);
                 undockPos += Situation.position;
-                if (disconnectDock.approachPath.Count > 0)
+                bool hasTaxiWay = disconnectDock.approachPath.Count > 0;
+                if (hasTaxiWay)
                 {
                     //*************************** Remove Below line if breaks *****************************//
                     Vector3D taxiBeginUnadjustedPos = disconnectDock.approachPath[disconnectDock.approachPath.Count - 1].position;
@@ -1282,14 +1283,15 @@ namespace IngameScript
                 //Navigation.AddWaypoint(undockPos, balancedDirection, Situation.gravityUpVector, APPROACH_SPEED, Waypoint.wpType.ALIGNING); //original alignment
                 if (!Situation.inGravity && Situation.alignDirectly)
                 {
-                    Navigation.AddWaypoint(undockPos, direction, Vector3D.Normalize(Vector3D.CalculatePerpendicularVector(direction)),
+                    Navigation.AddWaypoint(undockPos + Situation.linearVelocity, direction, Vector3D.Normalize(Vector3D.CalculatePerpendicularVector(direction)),
                         APPROACH_SPEED, Waypoint.wpType.ALIGNING);
                 }
                 else
                 {
-                    Navigation.AddWaypoint(undockPos, balancedDirection, Situation.gravityUpVector, APPROACH_SPEED, Waypoint.wpType.ALIGNING);
+                    Navigation.AddWaypoint(undockPos + Situation.linearVelocity, balancedDirection, Situation.gravityUpVector, APPROACH_SPEED, Waypoint.wpType.ALIGNING);
                 }
-                Navigation.AddWaypoint(undockPos, Situation.forwardVector, Situation.upVector, DOCK_SPEED, Waypoint.wpType.UNDOCKING);
+                Navigation.AddWaypoint(undockPos + Situation.linearVelocity, Situation.forwardVector, Situation.upVector,
+                    DOCK_SPEED + (float)Situation.linearVelocity.Length(), Waypoint.wpType.UNDOCKING);
 
             }
 
