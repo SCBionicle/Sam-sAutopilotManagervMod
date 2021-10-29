@@ -1226,13 +1226,14 @@ namespace IngameScript
                     }
                     Navigation.AddWaypoint(newPos, Vector3D.Zero, Vector3D.Zero, CONVERGING_SPEED, Waypoint.wpType.CONVERGING);
                 }
-                if (Situation.linearVelocity.Length() >= 2.0f)
+                disconnectDock = ConnectorControl.DisconnectAndTaxiData();
+                if (disconnectDock == null && Situation.linearVelocity.Length() >= 2.0f)
                 {
                     return;
 
                 }
 
-                disconnectDock = ConnectorControl.DisconnectAndTaxiData();
+                
                 direction = Vector3D.Normalize(newPos - Situation.position);
                 balancedDirection = Vector3D.ProjectOnPlane(ref direction, ref Situation.gravityUpVector);
                 if (disconnectDock == null)
