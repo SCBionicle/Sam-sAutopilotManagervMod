@@ -899,14 +899,16 @@ namespace IngameScript
                         #region Desired Climb Angle Calculations
                         //Climb angle calculations here
                         //float climbAngle;
-                        if (seaLevelAltitude+100 <= Situation.autoCruiseAltitude)
+                        if (seaLevelAltitude < 0)
+                            ClimbAngle = maxAscentAngle;
+                        else if (seaLevelAltitude + 100 <= Situation.autoCruiseAltitude)
                         {                       //(Max angle rads) / ...
-                            ClimbAngle = (float)(((Math.PI / 4) / (Math.PI/2)) * Math.Acos(2 * (seaLevelAltitude / Situation.autoCruiseAltitude) - 1));
+                            ClimbAngle = (float)(((Math.PI / 4) / (Math.PI / 2)) * Math.Acos(2 * (seaLevelAltitude / Situation.autoCruiseAltitude) - 1));
                         }
-                        else if(seaLevelAltitude-100 >= Situation.autoCruiseAltitude)
+                        else if (seaLevelAltitude - 100 >= Situation.autoCruiseAltitude)
                         {                        //(Max angle rads) / ...
-                            ClimbAngle = (float)(-((Math.PI / 2) / (Math.PI/2)) * Math.Acos(2 * 
-                                ((altitudeGravityStart - seaLevelAltitude) / (altitudeGravityStart - Situation.autoCruiseAltitude))-1));
+                            ClimbAngle = (float)(-((Math.PI / 2) / (Math.PI / 2)) * Math.Acos(2 *
+                                ((altitudeGravityStart - seaLevelAltitude) / (altitudeGravityStart - Situation.autoCruiseAltitude)) - 1));
                         }
                         else
                         {
