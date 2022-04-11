@@ -1252,25 +1252,26 @@ namespace IngameScript
                 balancedDirection = Vector3D.ProjectOnPlane(ref direction, ref Situation.gravityUpVector);
                 if (disconnectDock == null)
                 {
+                    double groundElevation = double.NaN;
+                    RemoteControl.block.TryGetPlanetElevation(MyPlanetElevation.Surface, out groundElevation);
+                    bool groundProximaty = Situation.planetDetected && groundElevation > 0 && groundElevation < Situation.radius;
                     //Navigation.AddWaypoint(Situation.position, balancedDirection, Situation.gravityUpVector, APPROACH_SPEED, Waypoint.wpType.ALIGNING); //original alignment
                     if (!Situation.inGravity && Situation.alignDirectly)
                     {
                         Navigation.AddWaypoint(Situation.position, direction, Vector3D.Normalize(Vector3D.CalculatePerpendicularVector(direction)),
                             APPROACH_SPEED, Waypoint.wpType.ALIGNING);
                     }
-                    else
+                    else if(!groundProximaty)
                     {
+
                         Navigation.AddWaypoint(Situation.position, balancedDirection, Situation.gravityUpVector, APPROACH_SPEED, Waypoint.wpType.ALIGNING);
                     }
-
-                    double groundElevation = double.NaN;
-                    RemoteControl.block.TryGetPlanetElevation(MyPlanetElevation.Surface, out groundElevation);
-                    if (Situation.planetDetected && groundElevation>0 && groundElevation<Situation.radius)
+                    else
                     {
                         Stance newPos = Navigation.GetPlanetaryVerticalStance((int)Math.Round(Situation.radius + UNDOCK_DISTANCE));
                         newPos.forward = Vector3D.Normalize(Vector3D.ProjectOnPlane(ref Situation.forwardVector, ref Situation.gravityUpVector));
                         newPos.up = Situation.gravityUpVector;
-
+                        Navigation.AddWaypoint(newPos.position, balancedDirection, Situation.gravityUpVector, APPROACH_SPEED, Waypoint.wpType.ALIGNING);
                         Navigation.AddWaypoint(newPos, DOCK_SPEED, Waypoint.wpType.UNDOCKING);
                     }
                     return;
