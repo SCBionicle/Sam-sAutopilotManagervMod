@@ -868,7 +868,7 @@ namespace IngameScript
                 Vector3D gravityUpNorm = Vector3D.Normalize(gravityUp); //normalized vector of upwards gravity
 
                 altitudeGravityStart = inGravity ? Math.Max(altitudeGravityStart, seaLevelAltitude) : 0;
-                const float maxDescentAngle = (float) -Math.PI / 2;
+                const float maxDescentAngle = ((float) -Math.PI / 2 + 0.01f);
                 const float maxAscentAngle = (float) Math.PI / 4;
 
                 if(!double.IsNaN(Situation.autoCruiseAltitude) && inGravity) //Is autocruise enabled and are you in a gravity well?
@@ -899,13 +899,14 @@ namespace IngameScript
                         #region Desired Climb Angle Calculations
                         //Climb angle calculations here
                         //float climbAngle;
+                        const int cruiseTolerance = 50;
                         if (seaLevelAltitude < 0)
                             ClimbAngle = maxAscentAngle;
-                        else if (seaLevelAltitude + 100 <= Situation.autoCruiseAltitude)
+                        else if (seaLevelAltitude + cruiseTolerance <= Situation.autoCruiseAltitude)
                         {                       //(Max angle rads) / ...
                             ClimbAngle = (float)(((Math.PI / 4) / (Math.PI / 2)) * Math.Acos(2 * (seaLevelAltitude / Situation.autoCruiseAltitude) - 1));
                         }
-                        else if (seaLevelAltitude - 100 >= Situation.autoCruiseAltitude)
+                        else if (seaLevelAltitude - cruiseTolerance >= Situation.autoCruiseAltitude)
                         {                        //(Max angle rads) / ...
                             ClimbAngle = (float)(-((Math.PI / 2) / (Math.PI / 2)) * Math.Acos(2 *
                                 ((altitudeGravityStart - seaLevelAltitude) / (altitudeGravityStart - Situation.autoCruiseAltitude)) - 1));
