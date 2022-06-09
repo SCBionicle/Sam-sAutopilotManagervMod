@@ -94,6 +94,8 @@ namespace IngameScript
 
         private static string ADVERT_ID = "SAMv2";
 
+        private static string IGC_TAG = "SAM";
+
         private static string STORAGE_VERSION = "deadbeef";
 
 
@@ -1488,8 +1490,8 @@ namespace IngameScript
                 Storage = "";
             }
             Runtime.UpdateFrequency = UpdateFrequency.Update100 | UpdateFrequency.Update10 | UpdateFrequency.Once;
-            listener = IGC.RegisterBroadcastListener(TAG);
-            listener.SetMessageCallback(TAG);
+            listener = IGC.RegisterBroadcastListener(IGC_TAG);
+            listener.SetMessageCallback(IGC_TAG);
             Signal.thisProgram = this;
         }
         public bool Load()
@@ -1841,7 +1843,7 @@ namespace IngameScript
         private MyIGCMessage igcData;
         public void UpdateIGC(ref string msg)
         {
-            if (msg != TAG)
+            if (msg != IGC_TAG)
             {
                 return;
 
@@ -1850,7 +1852,7 @@ namespace IngameScript
             while (listener.HasPendingMessage)
             {
                 igcData = listener.AcceptMessage();
-                if (igcData.Tag != TAG)
+                if (igcData.Tag != IGC_TAG)
                 {
                     continue;
                 }
@@ -2296,7 +2298,7 @@ namespace IngameScript
                 }
 
                 Serialize();
-                p.IGC.SendBroadcastMessage<string>(TAG, Serializer.serialized);
+                p.IGC.SendBroadcastMessage<string>(IGC_TAG, Serializer.serialized);
 
             }
             private static long gridEntityId;
