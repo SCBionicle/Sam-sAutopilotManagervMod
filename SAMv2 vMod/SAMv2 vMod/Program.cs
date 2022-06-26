@@ -859,7 +859,7 @@ namespace IngameScript
                 return null;
             }
 
-            private static double altitudeGravityStart = 0;
+            private static double altitudeGravityStart = 6000;
             public static float ClimbAngle = 0;
             private static void ProcessAutoCruise()
             {
@@ -884,7 +884,7 @@ namespace IngameScript
                     }
                     Vector3D desiredDestination = desiredDock ?? Vector3D.NegativeInfinity; //You can trust this to be valid coordinate (needed a default value to satisfy the compiler)
                     Vector3D dockDirNotNormed = desiredDestination - Situation.position;
-                    bool closeEnough = Vector3D.Distance(desiredDestination, Situation.position) < Situation.autoCruiseAltitude * 2; //Close enough to start descending?
+                    bool closeEnough = Vector3D.Distance(desiredDestination, Situation.position) < Math.Max(Situation.autoCruiseAltitude * 2,6000); //Close enough to start descending?
                     Vector3D dockDir = Vector3D.Normalize(dockDirNotNormed); //Direction of the destination compared to the vessel in question
                     bool toAbove = Vector3D.Dot(dockDir, gravityUpNorm) > 0.1; //Is the destination above the ship
                     bool directlyBelow;
