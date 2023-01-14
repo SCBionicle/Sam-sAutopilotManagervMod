@@ -94,6 +94,8 @@ namespace IngameScript
 
         private static string ADVERT_ID = "SAMv2";
 
+        private static string IGC_TAG = "SAM";
+
         private static string STORAGE_VERSION = "deadbeef";
 
 
@@ -133,6 +135,10 @@ namespace IngameScript
         private static string MSG_NO_REMOTE_CONTROL = "No Remote Control!";
 
         private static string MSG_INVALID_GPS_TYPE = "Invalid GPS format!";
+
+        private static string MSG_ASCENDING_BY = "Ascending by {0:N0}m...";
+
+        private static string MSG_DESCENDING_BY = "Descending by {0:N0}m...";
 
         private static float HORIZONT_CHECK_ANGLE_LIMIT = (float)Math.PI / 32.0f;
 
@@ -853,7 +859,7 @@ namespace IngameScript
                 return null;
             }
 
-            private static double altitudeGravityStart = 0;
+            private static double altitudeGravityStart = 6000;
             public static float ClimbAngle = 0;
             private static void ProcessAutoCruise()
             {
@@ -864,7 +870,7 @@ namespace IngameScript
                 Vector3D gravityUpNorm = Vector3D.Normalize(gravityUp); //normalized vector of upwards gravity
 
                 altitudeGravityStart = inGravity ? Math.Max(altitudeGravityStart, seaLevelAltitude) : 0;
-                const float maxDescentAngle = (float) -Math.PI / 2;
+                const float maxDescentAngle = ((float) -Math.PI / 2 + 0.01f);
                 const float maxAscentAngle = (float) Math.PI / 4;
 
                 if(!double.IsNaN(Situation.autoCruiseAltitude) && inGravity) //Is autocruise enabled and are you in a gravity well?
@@ -878,7 +884,7 @@ namespace IngameScript
                     }
                     Vector3D desiredDestination = desiredDock ?? Vector3D.NegativeInfinity; //You can trust this to be valid coordinate (needed a default value to satisfy the compiler)
                     Vector3D dockDirNotNormed = desiredDestination - Situation.position;
-                    bool closeEnough = Vector3D.Distance(desiredDestination, Situation.position) < Situation.autoCruiseAltitude * 2; //Close enough to start descending?
+                    bool closeEnough = Vector3D.Distance(desiredDestination, Situation.position) < Math.Max(Situation.autoCruiseAltitude * 2,6000); //Close enough to start descending?
                     Vector3D dockDir = Vector3D.Normalize(dockDirNotNormed); //Direction of the destination compared to the vessel in question
                     bool toAbove = Vector3D.Dot(dockDir, gravityUpNorm) > 0.1; //Is the destination above the ship
                     bool directlyBelow;
@@ -895,14 +901,17 @@ namespace IngameScript
                         #region Desired Climb Angle Calculations
                         //Climb angle calculations here
                         //float climbAngle;
-                        if (seaLevelAltitude+100 <= Situation.autoCruiseAltitude)
+                        const int cruiseTolerance = 50;
+                        if (seaLevelAltitude < 0)
+                            ClimbAngle = maxAscentAngle;
+                        else if (seaLevelAltitude + cruiseTolerance <= Situation.autoCruiseAltitude)
                         {                       //(Max angle rads) / ...
-                            ClimbAngle = (float)(((Math.PI / 4) / (Math.PI/2)) * Math.Acos(2 * (seaLevelAltitude / Situation.autoCruiseAltitude) - 1));
+                            ClimbAngle = (float)(((Math.PI / 4) / (Math.PI / 2)) * Math.Acos(2 * (seaLevelAltitude / Situation.autoCruiseAltitude) - 1));
                         }
-                        else if(seaLevelAltitude-100 >= Situation.autoCruiseAltitude)
+                        else if (seaLevelAltitude - cruiseTolerance >= Situation.autoCruiseAltitude)
                         {                        //(Max angle rads) / ...
-                            ClimbAngle = (float)(-((Math.PI / 2) / (Math.PI/2)) * Math.Acos(2 * 
-                                ((altitudeGravityStart - seaLevelAltitude) / (altitudeGravityStart - Situation.autoCruiseAltitude))-1));
+                            ClimbAngle = (float)(-((Math.PI / 2) / (Math.PI / 2)) * Math.Acos(2 *
+                                ((altitudeGravityStart - seaLevelAltitude) / (altitudeGravityStart - Situation.autoCruiseAltitude)) - 1));
                         }
                         else
                         {
@@ -1077,6 +1086,21 @@ namespace IngameScript
                 return waypoints.Count == 0;
 
             }
+
+            /// <summary>
+            /// Gets the vectorless position above or below the ship within a gravity well
+            /// </summary>
+            /// <param name="distance">distance in meters, positive means ascend</param>
+            /// <returns>Stance (vectorless), null if not in planet</returns>
+            public static Stance GetPlanetaryVerticalStance(int distance)
+            {
+                if (!Situation.planetDetected) { return null; }
+
+                Vector3D planetaryUpVector = -Vector3D.Normalize(Situation.naturalGravity);
+
+                Vector3D newPos = Situation.position + planetaryUpVector * distance;
+                return new Stance(newPos, Vector3D.Zero, Vector3D.Zero);
+            }
         }
         public static class Pilot
         {
@@ -1231,15 +1255,27 @@ namespace IngameScript
                 balancedDirection = Vector3D.ProjectOnPlane(ref direction, ref Situation.gravityUpVector);
                 if (disconnectDock == null)
                 {
+                    double groundElevation = double.NaN;
+                    RemoteControl.block.TryGetPlanetElevation(MyPlanetElevation.Surface, out groundElevation);
+                    bool groundProximaty = Situation.planetDetected && groundElevation > 0 && groundElevation < Situation.radius;
                     //Navigation.AddWaypoint(Situation.position, balancedDirection, Situation.gravityUpVector, APPROACH_SPEED, Waypoint.wpType.ALIGNING); //original alignment
                     if (!Situation.inGravity && Situation.alignDirectly)
                     {
                         Navigation.AddWaypoint(Situation.position, direction, Vector3D.Normalize(Vector3D.CalculatePerpendicularVector(direction)),
                             APPROACH_SPEED, Waypoint.wpType.ALIGNING);
                     }
+                    else if(!groundProximaty)
+                    {
+
+                        Navigation.AddWaypoint(Situation.position, balancedDirection, Situation.gravityUpVector, APPROACH_SPEED, Waypoint.wpType.ALIGNING);
+                    }
                     else
                     {
-                        Navigation.AddWaypoint(Situation.position, balancedDirection, Situation.gravityUpVector, APPROACH_SPEED, Waypoint.wpType.ALIGNING);
+                        Stance newPos = Navigation.GetPlanetaryVerticalStance((int)Math.Round(Situation.radius + UNDOCK_DISTANCE));
+                        newPos.forward = Vector3D.Normalize(Vector3D.ProjectOnPlane(ref Situation.forwardVector, ref Situation.gravityUpVector));
+                        newPos.up = Situation.gravityUpVector;
+                        Navigation.AddWaypoint(newPos.position, balancedDirection, Situation.gravityUpVector, APPROACH_SPEED, Waypoint.wpType.ALIGNING);
+                        Navigation.AddWaypoint(newPos, DOCK_SPEED, Waypoint.wpType.UNDOCKING);
                     }
                     return;
                 }
@@ -1418,6 +1454,24 @@ namespace IngameScript
                 Start();
 
             }
+
+            /// <summary>
+            /// Starts autopilot session of vertical movement.
+            /// 
+            /// <code>Assumes planetary check is already done</code>
+            /// </summary>
+            /// <seealso cref="Navigation.GetPlanetaryVerticalStance(int)"/>
+            /// <param name="distance">positive is ascension</param>
+            public static void Ascend(int distance)
+            {
+                Stance newPosition = Navigation.GetPlanetaryVerticalStance(distance);
+
+                Dock goal = Dock.NewDock(newPosition, "Vertical navigation");
+                string msg = distance > 0 ? String.Format(MSG_ASCENDING_BY, distance) : string.Format(MSG_DESCENDING_BY, -distance);
+                Logger.Log(msg);
+
+                Start(goal);
+            }
         }
         private IMyBroadcastListener listener;
         private bool clearStorage = false;
@@ -1436,8 +1490,8 @@ namespace IngameScript
                 Storage = "";
             }
             Runtime.UpdateFrequency = UpdateFrequency.Update100 | UpdateFrequency.Update10 | UpdateFrequency.Once;
-            listener = IGC.RegisterBroadcastListener(TAG);
-            listener.SetMessageCallback(TAG);
+            listener = IGC.RegisterBroadcastListener(IGC_TAG);
+            listener.SetMessageCallback(IGC_TAG);
             Signal.thisProgram = this;
         }
         public bool Load()
@@ -1681,6 +1735,22 @@ namespace IngameScript
                     case "SCAN":
                         ScanGrid();
                         break;
+                    case "CLIMB":
+                        Situation.RefreshParameters();
+                        int change;
+                        if(!int.TryParse(arg1, out change))
+                        {
+                            Logger.Err("Climb argument is not an integer.");
+                            break;
+                        }
+                        if (!Situation.planetDetected)
+                        {
+                            Logger.Err("Unable to execute, not in gravity well.");
+                            break;
+                        }
+
+                        Pilot.Ascend(change);
+                        break;
                     default:
                         Logger.Err("Unknown command ->" + arg0 + "<-");
                         break;
@@ -1773,7 +1843,7 @@ namespace IngameScript
         private MyIGCMessage igcData;
         public void UpdateIGC(ref string msg)
         {
-            if (msg != TAG)
+            if (msg != IGC_TAG)
             {
                 return;
 
@@ -1782,7 +1852,7 @@ namespace IngameScript
             while (listener.HasPendingMessage)
             {
                 igcData = listener.AcceptMessage();
-                if (igcData.Tag != TAG)
+                if (igcData.Tag != IGC_TAG)
                 {
                     continue;
                 }
@@ -2228,7 +2298,7 @@ namespace IngameScript
                 }
 
                 Serialize();
-                p.IGC.SendBroadcastMessage<string>(TAG, Serializer.serialized);
+                p.IGC.SendBroadcastMessage<string>(IGC_TAG, Serializer.serialized);
 
             }
             private static long gridEntityId;
